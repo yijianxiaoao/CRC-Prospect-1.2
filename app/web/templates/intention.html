@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block heading %}Screening Willingness and Outcomes{% endblock %}
+{% block content %}
+<h1>Intention–Action Gap and Main Barriers</h1>
+<div class="sub-title">Six-month colonoscopy screening intention, actual completion, and multi-select barriers</div>
+
+<div class="grid c4">
+  <div class="card kpi reveal"><h3>Screening Willingness</h3><div class="num" id="k1">-</div></div>
+  <div class="card kpi reveal"><h3>Actual Screening</h3><div class="num" id="k2">-</div></div>
+  <div class="card kpi reveal"><h3>Delayed Decision</h3><div class="num" id="k3">-</div></div>
+  <div class="card kpi reveal"><h3>Sample Size</h3><div class="num" id="k4">-</div></div>
+</div>
+
+<div class="card figure-card reveal" style="margin-top:14px">
+  <div class="figure-head">
+    <div><h3 class="figure-title">Screening Intention–Action Gap and Main Barriers</h3><p class="figure-caption">n = 1,600; intention and completed screening are shown separately; barriers are multi-select counts.</p></div>
+    <span class="chart-badge"><i></i>Dynamic figure</span>
+  </div>
+  <div class="figure-grid">
+    <div class="figure-panel">
+      <h3>Screening intention–action gap</h3>
+      <div id="gapChart" class="chart" style="height:520px" role="img" aria-label="Horizontal bar chart of screening intention and completed screening"></div>
+    </div>
+    <div class="figure-panel">
+      <h3>Main screening barriers</h3>
+      <div id="barrierChart" class="chart" style="height:520px" role="img" aria-label="Horizontal bar chart of the main screening barriers"></div>
+    </div>
+  </div>
+  <div class="figure-note">Delayed screening and undecided are outcome categories and do not form a strict decreasing sequence with the first three funnel levels. Barriers are multi-select, so percentages may sum to more than 100%.</div>
+</div>
+
+<div class="card reveal" style="margin-top:14px"><h3>Model Interpretation</h3><div class="note">Screening intention over the next six months is an intervention target that precedes the screening decision. Actual colonoscopy behavior is jointly influenced by decision reference points, service accessibility, policy support, and prospect theory biases.</div></div>
+{% endblock %}
+{% block script %}<script>(async function(){
+  const d=await loadJSON('/api/overview'); const k=d.kpis;
+  animateNumber('k1',k.intention_rate,'%',1,900); animateNumber('k2',k.screening_rate,'%',1,900); animateNumber('k3',k.delay_rate,'%',1,900); animateNumber('k4',k.n,'',0,900);
+  const outcome=Object.fromEntries((d.outcomes||[]).map(x=>[x.name,x.value]));
+  const willing=(d.intention||[]).find(x=>x.name.includes('Intends'))?.value||0;
+  const actual=outcome['Completed screening on time']||0;
+  const delayed=outcome['Delayed screening']||0;
+  const undecided=outcome['Undecided']||0;
+  const n=Number(k.n)||1600;
+  const rows=[
+    {name:'Study participants',value:n,color:'#9aaec0'},
+    {name:'Intention in next 6 months',value:willing,color:'#2563eb'},
+    {name:'Completed screening',value:actual,color:'#1fa99c'},
+    {name:'Delayed screening',value:delayed,color:'#e8a33d'},
+    {name:'Undecided',value:undecided,color:'#c4cbd3'}
+  ].map(x=>Object.assign(x,{rate:n?x.value/n*100:0}));
+  const gapMax=Math.ceil(n*1.12/250)*250;
+  const gapOption=motionDefaults({
+    tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:p=>{const r=rows[p[0].dataIndex];return r.name+'<br/>'+r.value+' participants ('+r.rate.toFixed(1)+'%)';}},
+    grid:{left:150,right:112,top:18,bottom:36,containLabel:true},
+    xAxis:{type:'value',min:0,max:gapMax,name:'Participants',nameLocation:'middle',nameGap:28,axisLabel:{fontSize:11,formatter:v=>v>=1000?(v/1000).toFixed(1)+'k':v},splitLine:{lineStyle:{color:'#edf2f7'}}},
+    yAxis:{type:'category',inverse:true,data:rows.map(x=>x.name),axisTick:{show:false},axisLine:{show:false},axisLabel:{fontSize:11,width:150,overflow:'break',lineHeight:15}},
+    series:[{type:'bar',barMaxWidth:38,data:rows.map(r=>({value:r.value,rate:r.rate,itemStyle:{color:r.color,borderRadius:[0,5,5,0]}})),label:{show:true,position:'right',distance:7,fontSize:11,color:'#30475e',formatter:p=>p.value+'  ('+p.data.rate.toFixed(1)+'%)'},animationDelay:i=>i*100}]
+  });
+  registerChart('gapChart',gapOption); chart('gapChart').setOption(gapOption);
+  const bars=(d.barriers||[]).slice(0,6).map((x,i)=>({name:x.name,value:x.value,rate:n?x.value/n*100:0,color:['#df6478','#e8a33d','#ef8b42','#7c6ee6','#2f9fda','#49b77c'][i%6]}));
+  const barrierMax=Math.max(...bars.map(x=>x.value),1);
+  const barrierOption=motionDefaults({
+    tooltip:{trigger:'axis',formatter:p=>{const r=bars[p[0].dataIndex];return r.name+'<br/>'+r.value+' mentions ('+r.rate.toFixed(1)+'%)';}},
+    grid:{left:220,right:90,top:18,bottom:36,containLabel:true},
+    xAxis:{type:'value',min:0,max:Math.ceil(barrierMax*1.20/200)*200,splitNumber:4,name:'Mentions (multi-select)',nameLocation:'middle',nameGap:28,axisLabel:{fontSize:11,formatter:v=>v>=1000?(v/1000).toFixed(1)+'k':v},splitLine:{lineStyle:{color:'#edf2f7'}}},
+    yAxis:{type:'category',inverse:true,data:bars.map(x=>x.name),axisTick:{show:false},axisLine:{show:false},axisLabel:{fontSize:11,width:205,overflow:'break',lineHeight:15}},
+    series:[{type:'bar',barMaxWidth:38,data:bars.map(r=>({value:r.value,itemStyle:{color:r.color,borderRadius:[0,5,5,0]}})),label:{show:true,position:'right',distance:7,fontSize:11,color:'#30475e',formatter:p=>p.value+'  ('+bars[p.dataIndex].rate.toFixed(1)+'%)'},animationDelay:i=>i*110}]
+  });
+  registerChart('barrierChart',barrierOption); chart('barrierChart').setOption(barrierOption);
+})();</script>{% endblock %}

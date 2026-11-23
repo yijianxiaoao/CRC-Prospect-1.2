@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block heading %}Accounts and Permissions{% endblock %}
+{% block content %}
+<h1>Account and Permission Management</h1>
+<div class="sub-title">Administrators can adjust roles and reset temporary passwords. All actions are written to the audit log.</div>
+
+<div class="card">
+  <h3>Role Permissions</h3>
+  <table><thead><tr><th>Role</th><th>Permission Scope</th></tr></thead><tbody>
+    <tr><td><span class="tag tag-neu">Viewer</span></td><td>Read-only access to the dashboard and analysis results</td></tr>
+    <tr><td><span class="tag tag-blue">Researcher</span></td><td>View data, import questionnaires, review data, and manage access controls</td></tr>
+    <tr><td><span class="tag tag-pos">Administrator</span></td><td>Full permissions, including data review, data locking, report export, and account management</td></tr>
+  </tbody></table>
+</div>
+
+<div class="card" style="margin-top:14px">
+  <h3>Account List</h3>
+  <div id="pending" class="note" style="margin:0 0 10px"></div>
+  <div class="scroll" style="max-height:520px">
+    <table><thead><tr>
+      <th>ID</th><th>Username</th><th>Nickname</th><th>Role</th><th>Source</th><th>Status</th><th>MFA</th><th>Approval</th><th>Created</th><th>Actions</th>
+    </tr></thead><tbody id="rows"></tbody></table>
+  </div>
+  <div id="msg" style="margin-top:10px;font-size:13px;color:#7b8b9c"></div>
+</div>
+
+<div class="note" style="margin-top:14px">
+  Self-registered accounts default to Pending Review and the Viewer role. An administrator must approve the account before sign-in.
+  Deactivating an account invalidates its existing sessions. After a password reset, the user must change the temporary password at first login.
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+async function load(){
+  const d = await loadJSON('/api/users');
+  document.getElementById('pending').textContent = d.pending_count
+    ? 'There are currently '+d.pending_count+' accounts awaiting approval. ' : 'There are currently no accounts pending approval.';
+  document.getElementById('rows').innerHTML = d.items.map(u => {
+    const options = Object.entries(d.roles).map(([k,v]) =>
+      '<option value="'+k+'" '+(u.role===k?'selected':'')+'>'+v+' '+k+'</option>').join('');
+    let actions = '';
+    if(u.status==='pending'){
+      actions = '<a class="link" href="javascript:changeStatus('+u.id+',\'active\')">Approve</a> · '+
+                '<a class="link" href="javascript:changeStatus('+u.id+',\'suspended\')">Reject</a>';
+    } else if(u.status==='active'){
+      actions = '<a class="link" href="javascript:changeStatus('+u.id+',\'suspended\')">Disabled</a>';
+    } else {
+      actions = '<a class="link" href="javascript:changeStatus('+u.id+',\'active\')">Re-enable</a>';
+    }
+    actions += ' · <a class="link" href="javascript:resetPwd('+u.id+',\''+u.username+'\')">Reset password</a>';
+    if(u.mfa_enabled) actions += ' · <a class="link" href="javascript:resetMfa('+u.id+',\''+u.username+'\')">Reset MFA</a>';
+    return '<tr><td>'+u.id+'</td><td><b>'+escapeHtml(u.username)+'</b></td><td>'+escapeHtml(u.nickname)+'</td>'+
+      '<td><select onchange="changeRole('+u.id+',this.value)">'+options+'</select></td>'+
+      '<td>'+(u.auth_source==='sso'?'<span class="tag tag-blue">SSO</span>':'"Local')+'</td>'+
+      '<td>'+(u.status==='active'?'<span class="tag tag-pos">Enabled</span>'
+            :u.status==='pending'?'<span class="tag tag-neu">Pending Review</span>'
+            :'<span class="tag tag-neg">Disabled</span>')+'</td>'+
+      '<td>'+(u.mfa_enabled?'<span class="tag tag-pos">Enabled</span>':'Not enabled')+'</td>'+
+      '<td>'+(u.approved_by?escapeHtml(u.approved_by)+'<br><span style="color:#8792a2">'+escapeHtml(u.approved_at)+'</span>':'-')+'</td>'+
+      '<td>'+escapeHtml(u.created_at)+'</td>'+
+      '<td style="white-space:nowrap">'+actions+'</td></tr>';
+  }).join('') || '<tr><td colspan="10">No accounts are currently available</td></tr>';
+}
+async function changeRole(id, role){
+  const body = new URLSearchParams({role:role});
+  const r = await fetch('/api/users/'+id+'/role', {method:'POST', body,
+    headers:csrfHeaders({'Accept':'application/json'})});
+  const d = await r.json();
+  document.getElementById('msg').textContent = d.msg;
+  if(!d.ok) await load();
+}
+async function changeStatus(id, status){
+  const body = new URLSearchParams({status:status});
+  const r = await fetch('/api/users/'+id+'/status', {method:'POST', body,
+    headers:csrfHeaders({'Accept':'application/json'})});
+  const d = await r.json();
+  document.getElementById('msg').textContent = d.msg;
+  await load();
+}
+async function resetPwd(id, username){
+  if(!confirm('Reset the password for '+username+'? ')) return;
+  const r = await fetch('/api/users/'+id+'/reset_password', {method:'POST',
+    headers:csrfHeaders({'Accept':'application/json'})});
+  const d = await r.json();
+  if(d.ok){
+    prompt('The temporary password is shown only once. Share it securely: ', d.temporary_password);
+    await load();
+  } else {
+    alert(d.msg);
+  }
+}
+async function resetMfa(id, username){
+  if(!confirm('Reset MFA for '+username+'? All existing sessions for this user will be invalidated immediately.')) return;
+  const r = await fetch('/api/users/'+id+'/reset_mfa', {method:'POST',
+    headers:csrfHeaders({'Accept':'application/json'})});
+  const d = await r.json();
+  document.getElementById('msg').textContent = d.msg;
+  await load();
+}
+load();
+</script>
+{% endblock %}

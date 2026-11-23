@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block heading %}Audit Log{% endblock %}
+{% block content %}
+<h1>Audit Log</h1>
+<div class="sub-title">Sign-ins, imports, reviews, unblinding, exports, and other key operations. Each log entry is protected by an HMAC chain that detects tampering.</div>
+
+<div class="card">
+  <div id="chainStatus" style="margin-bottom:10px;font-size:13px"></div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+    <select id="actionFilter" onchange="load()" style="padding:7px 10px;border:1px solid #e3eaf2;border-radius:8px">
+      <option value="">All operations</option>
+      <option>Sign in</option><option>Login failed</option><option>Sign Out</option>
+      <option>User registration</option><option>Change Password</option>
+      <option>Data import</option><option>Data review</option><option>Bulk review</option><option>Unblinding</option>
+      <option>Role change</option><option>Reset password</option><option>Data lock</option>
+      <option>Unlock data</option><option>Report export</option>
+    </select>
+    <button class="btn" onclick="load()">Refresh</button>
+    <span id="count" style="font-size:13px;color:#7b8b9c"></span>
+  </div>
+</div>
+
+<div class="grid c2" style="margin-top:14px">
+  <div class="card"><h3>Action Type Statistics</h3><div id="summary" class="chart"></div></div>
+  <div class="card"><h3>Audit Statement</h3>
+    <ul class="criteria">
+      <li>Records the operator, action type, target, details, IP address, and time.</li>
+      <li>Failed sign-in attempts are also recorded for security auditing.</li>
+      <li>Data locking, unlocking, and report exports record the reason and operator.</li>
+      <li>Logs are append-only and cannot be modified, supporting compliance verification.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="card" style="margin-top:14px">
+  <h3>Operation Records</h3>
+  <div class="scroll" style="max-height:560px">
+    <table><thead><tr>
+      <th>Time</th><th>Operator</th><th>Action Type</th><th>Target</th><th>Details</th><th>IP</th><th>Log Hash</th>
+    </tr></thead><tbody id="rows"></tbody></table>
+  </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+async function load(){
+  const action = document.getElementById('actionFilter').value;
+  const d = await loadJSON('/api/audit?action=' + encodeURIComponent(action));
+  document.getElementById('count').textContent = 'Total records: ' + d.items.length;
+  document.getElementById('chainStatus').innerHTML = d.chain.valid
+    ? '<span class="tag tag-pos">The audit chain is complete</span> Verified ' + d.chain.checked + '/' + d.chain.count + ' records'
+    : '<span class="tag tag-neg">Audit chain anomaly</span> Breakpoint ID: ' + (d.chain.broken_id || '-') + ', Reason: ' + escapeHtml(d.chain.reason || 'Unknown');
+  document.getElementById('rows').innerHTML = d.items.map(x =>
+    '<tr><td>'+escapeHtml(x.created_at)+'</td><td>'+escapeHtml(x.username)+'</td>'+
+    '<td><span class="tag tag-blue">'+escapeHtml(x.action)+'</span></td>'+
+    '<td>'+escapeHtml(x.target)+'</td><td style="color:#7b8b9c;font-size:12.5px">'+escapeHtml(x.detail)+'</td>'+
+    '<td style="color:#98a4b2;font-size:12px">'+escapeHtml(x.ip||'-')+'</td>'+
+    '<td style="font-family:monospace;font-size:11px">'+escapeHtml(x.hash||'-')+'</td></tr>').join('')
+    || '<tr><td colspan="7">No records are currently available</td></tr>';
+  chart('summary').setOption(motionDefaults({
+    tooltip:{trigger:'item',formatter:'{b}<br/>{c} records ({d}%)'}, legend:{bottom:0},
+    series:[{type:'pie',radius:['36%','62%'],center:['50%','44%'],padAngle:2,itemStyle:{borderRadius:6,borderColor:'#fff',borderWidth:2},label:{show:false},labelLine:{show:false},data:d.summary}]
+  }));
+}
+load();
+</script>
+{% endblock %}

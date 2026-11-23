@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block heading %}Questionnaire Data Import{% endblock %}
+{% block content %}
+<h1>Questionnaire Data Import</h1><div class="sub-title">CSV/XLSX import with automatic rejection of names, national ID numbers, and other direct identifiers such as contact details</div>
+<div class="card visual-card reveal">
+  <div class="visual-split reverse">
+    <div class="visual-copy">
+      <span class="chart-badge"><i></i>Protected ingestion</span>
+      <h3 style="margin-top:12px">From questionnaire file to analysis-ready records</h3>
+      <p>Every uploaded row is inspected before it reaches the study database. Direct identifiers are rejected, field types are checked, and valid rows are committed independently so one mistake does not interrupt the rest of the file.</p>
+      <ol><li>Download the standard template.</li><li>Encode questionnaires with anonymous study IDs and structured variables.</li><li>Preview the mapping, then import valid rows in independent transactions.</li></ol>
+      <a class="btn btn-primary" href="/api/import/template" style="display:inline-block;text-decoration:none">Download import template</a>
+    </div>
+    <img class="illustration" src="{{ url_for('static', filename='images/data-integrity.svg') }}" alt="Animated data ingestion and privacy protection workflow">
+  </div>
+  <div class="status-ribbon">
+    <div class="status-item"><div class="status-icon">PII</div><div><b>Identifier screening</b><span>Names, IDs and contacts rejected</span></div></div>
+    <div class="status-item"><div class="status-icon">ROW</div><div><b>Row-level transactions</b><span>Errors remain isolated</span></div></div>
+    <div class="status-item"><div class="status-icon">QC</div><div><b>Preview before commit</b><span>Columns and values are inspectable</span></div></div>
+  </div>
+</div>
+<div class="card reveal" style="margin-top:14px"><h3>Upload questionnaire data</h3><input type="file" id="file" accept=".csv,.xlsx"><button class="btn btn-primary" onclick="upload(false)">Preview only</button><button class="btn" onclick="upload(true)">Import Data</button><div id="msg" class="note" style="margin-top:10px"></div><div class="scroll" style="margin-top:10px"><table id="preview"></table></div></div>
+{% endblock %}
+{% block script %}<script>async function upload(execute){const f=document.getElementById('file').files[0];if(!f){alert('Please select a file');return;}const body=new FormData();body.append('file',f);const url=execute?'/api/import/execute':'/api/import/preview';const msg=document.getElementById('msg');msg.textContent=execute?'Importing records…':'Reading and checking the file…';const r=await fetch(url,{method:'POST',body,headers:csrfHeaders({'Accept':'application/json'})});const d=await r.json();msg.textContent=d.ok?('Completed: '+(execute?('Imported '+d.success+' records'):('Read '+d.total+' records'))):(d.error||d.msg);if(d.columns){document.getElementById('preview').innerHTML='<thead><tr>'+d.columns.map(c=>'<th>'+escapeHtml(c)+'</th>').join('')+'</tr></thead><tbody>'+d.rows.map(row=>'<tr>'+d.columns.map(c=>'<td>'+escapeHtml(row[c])+'</td>').join('')+'</tr>').join('')+'</tbody>';}}</script>{% endblock %}

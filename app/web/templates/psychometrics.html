@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block heading %}Scale Reliability and Validity{% endblock %}
+{% block content %}
+<h1>Reliability and Validity of the Health Literacy and General Self-Efficacy Scales</h1><div class="sub-title">Cronbach alpha, corrected item-total correlations, and exploratory factor analysis</div>
+<div class="grid c2">
+  <div class="card visual-card reveal">
+    <h3>Health literacy scale</h3>
+    <div class="grid c2" style="grid-template-columns:200px 1fr;align-items:center">
+      <div id="hlGauge" class="chart mini" style="height:210px"></div>
+      <div><div class="num" id="hl">-</div><div class="sub">Cronbach α</div><div id="hlItems"></div></div>
+    </div>
+  </div>
+  <div class="card visual-card reveal">
+    <h3>General Self-Efficacy Scale</h3>
+    <div class="grid c2" style="grid-template-columns:200px 1fr;align-items:center">
+      <div id="seGauge" class="chart mini" style="height:210px"></div>
+      <div><div class="num" id="se">-</div><div class="sub">Cronbach α</div><div id="seItems"></div></div>
+    </div>
+  </div>
+</div>
+<div class="card reveal" style="margin-top:14px"><h3>Exploratory factor analysis</h3><pre id="efa" class="code"></pre></div>
+{% endblock %}
+{% block script %}<script>(async function(){
+const d=await loadJSON('/api/psychometrics');const hlAlpha=Number(d.reliability.health_literacy.alpha),seAlpha=Number(d.reliability.self_efficacy.alpha);
+animateNumber('hl',hlAlpha,'',3,900);animateNumber('se',seAlpha,'',3,900);
+const gauge=(value,stops)=>({animationDuration:1400,series:[{type:'gauge',startAngle:210,endAngle:-30,min:0,max:1,radius:'92%',center:['50%','54%'],progress:{show:true,roundCap:true,width:17,itemStyle:{color:{type:'linear',x:0,y:0,x2:1,y2:1,colorStops:stops}}},axisLine:{lineStyle:{width:17,color:[[1,'#e7eef5']]}},axisTick:{show:false},splitLine:{show:false},axisLabel:{show:false},pointer:{show:false},anchor:{show:false},detail:{valueAnimation:true,formatter:v=>Number(v).toFixed(3),fontSize:22,fontWeight:800,color:'#0f4c85',offsetCenter:[0,'8%']},title:{show:true,offsetCenter:[0,'45%'],fontSize:12,fontWeight:700,color:'#5d7488'},data:[{value:value,name:'Cronbach α'}]}]});
+const hlOption=gauge(hlAlpha,[{offset:0,color:'#2563eb'},{offset:1,color:'#35b8b1'}]);registerChart('hlGauge',hlOption);chart('hlGauge').setOption(hlOption);
+const seOption=gauge(seAlpha,[{offset:0,color:'#12a594'},{offset:1,color:'#7c6ee6'}]);registerChart('seGauge',seOption);chart('seGauge').setOption(seOption);
+document.getElementById('hlItems').innerHTML=d.reliability.health_literacy.items.map(x=>'<p>'+escapeHtml(x.item)+': Mean '+x.mean+', CITC '+x.citc+'</p>').join('');
+document.getElementById('seItems').innerHTML=d.reliability.self_efficacy.items.slice(0,4).map(x=>'<p>'+escapeHtml(x.item)+': Mean '+x.mean+', CITC '+x.citc+'</p>').join('');
+document.getElementById('efa').textContent=JSON.stringify(d.validity.efa,null,2);
+})();</script>{% endblock %}

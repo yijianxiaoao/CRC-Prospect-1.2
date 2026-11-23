@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block heading %}Probit Analysis{% endblock %}
+{% block content %}
+<h1>Probit Regression Analysis</h1>
+<div class="sub-title">Binary dependent variable: participation in screening. Reports Probit coefficients, average marginal effects (AMEs), and model-fit indices.</div>
+
+<div class="grid c21" style="margin-bottom:14px">
+  <div class="card visual-card reveal"><div class="chart-toolbar"><h3>Probit Link Function Φ(z)</h3><span class="chart-badge"><i></i>Animated probability curve</span></div><div id="probitCurve" class="chart" style="height:390px" role="img" aria-label="Probit link function probability curve"></div></div>
+  <div class="card insight-panel reveal"><span class="chart-badge"><i></i>Model intuition</span><h3 style="margin-top:12px;color:#14304d;font-size:18px">The latent index is mapped into a screening probability</h3><p>Negative values of z imply a probability below 50%; positive values imply a probability above 50%. The curve is steepest around the centre, where a small change in the latent decision index has the largest effect on predicted participation.</p><div class="story-strip" style="grid-template-columns:1fr"><div class="story-step"><b>z = Xβ</b><span>Observed factors form a latent decision index.</span></div><div class="story-step"><b>P = Φ(z)</b><span>The normal CDF converts that index to probability.</span></div></div></div>
+</div>
+
+<div class="grid c4">
+  <div class="card kpi reveal"><h3>Sample Size</h3><div class="num" id="k1">-</div></div>
+  <div class="card kpi reveal"><h3>Screening Events</h3><div class="num" id="k2">-</div></div>
+  <div class="card kpi reveal"><h3>McFadden R²</h3><div class="num" id="k3">-</div><div class="sub">Higher values indicate better fit</div></div>
+  <div class="card kpi reveal"><h3>AIC</h3><div class="num" id="k4">-</div><div class="sub">Lower is better</div></div>
+</div>
+
+<div class="card figure-card reveal" style="margin-top:14px">
+  <div class="figure-head">
+    <div><h3 class="figure-title">Average marginal effects (AME, 95% CI)</h3><p id="ameCaption" class="figure-caption">Calculating average marginal effects…</p></div>
+    <span class="chart-badge"><i></i>Percentage-point change</span>
+  </div>
+  <div id="ameChart" class="chart" style="height:640px" role="img" aria-label="Forest plot of average marginal effects with 95% confidence intervals"></div>
+  <div class="figure-note">For continuous variables, the AME is the average change in screening probability per one-unit increase. For binary variables, the AME is the average probability difference relative to the reference category. The figure shows core constructs and decision variables; the full model is shown below.</div>
+</div>
+
+<div class="card reveal" style="margin-top:14px">
+  <h3>Probit Regression Results</h3>
+  <div class="scroll">
+    <table><thead><tr>
+      <th>Variable</th><th>β</th><th>Standard error</th><th>z</th><th>P</th><th>β 95% CI</th><th>AME</th><th>AME 95% CI</th><th>Diagnostics</th>
+    </tr></thead><tbody id="rows"></tbody></table>
+  </div>
+</div>
+
+<div class="note reveal" style="margin-top:14px">
+  <b>Methods: </b>The Probit model assumes P(y=1|X)=Φ(Xβ) and is estimated by maximum likelihood. AMEs are averaged across all individuals; for binary variables, the 0→1 discrete probability difference is used. The model includes an intercept, but only independent variables are shown in the table.
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+(async function(){
+  const d = await loadJSON('/api/probit');
+  if(!d.ok || !d.model){ document.getElementById('rows').innerHTML = '<tr><td colspan="9">No data are currently available</td></tr>'; return; }
+  const m = d.model;
+  animateNumber('k1',m.n,'',0,850); animateNumber('k2',m.events,'',0,850); animateNumber('k3',m.pseudo_r2,'',3,850); animateNumber('k4',m.aic,'',1,850);
+  function erf(x){const sign=x<0?-1:1;const a=Math.abs(x);const t=1/(1+.3275911*a);const y=1-((((1.061405429*t-1.453152027)*t+1.421413741)*t-.284496736)*t+.254829592)*t*Math.exp(-a*a);return sign*y;}
+  function normCdf(z){return .5*(1+erf(z/Math.sqrt(2)));}
+  const curve=[];for(let z=-4;z<=4.001;z+=.1)curve.push([Number(z.toFixed(1)),Number(normCdf(z).toFixed(4))]);
+  const curveOption=motionDefaults({tooltip:{trigger:'axis',formatter:p=>'z = '+Number(p[0].value[0]).toFixed(1)+'<br/>P(screening) = '+Number(p[0].value[1]).toFixed(3)},grid:{left:58,right:26,top:26,bottom:48,containLabel:true},xAxis:{type:'value',min:-4,max:4,name:'Latent decision index z',nameLocation:'middle',nameGap:31,splitLine:{lineStyle:{color:'#edf2f7'}}},yAxis:{type:'value',min:0,max:1,axisLabel:{formatter:v=>Math.round(v*100)+'%'},splitLine:{lineStyle:{color:'#edf2f7'}}},series:[{type:'line',data:curve,showSymbol:false,smooth:true,lineStyle:{width:3.5,color:'#1668b3'},areaStyle:{color:'rgba(22,104,179,.10)'}},{type:'effectScatter',data:[[0,.5]],symbolSize:12,itemStyle:{color:'#12a594'},rippleEffect:{scale:3.2,brushType:'stroke'},markLine:{silent:true,symbol:'none',lineStyle:{type:'dashed',color:'#c8973f'},data:[{xAxis:0},{yAxis:.5}]}}],animationDuration:1600,animationEasing:'cubicOut'});
+  registerChart('probitCurve',curveOption); chart('probitCurve').setOption(curveOption);
+
+  const preferred=['Health literacy','Disease cognition','Self-efficacy','Representativeness heuristic bias','Availability heuristic bias','Anchoring and adjustment','Certainty effect','Reflection effect','Isolation effect','Decision reference point','Service accessibility','Policy support'];
+  const allRows=m.ame_features.map((f,i)=>({label:f,value:m.ame[i]*100,low:m.ame_ci_low[i]*100,high:m.ame_ci_high[i]*100,p:m.p[i+1]}));
+  let rows=preferred.map(name=>allRows.find(r=>r.label===name)).filter(Boolean);
+  if(!rows.length) rows=allRows;
+  document.getElementById('ameCaption').textContent='Outcome: actual colonoscopy screening behavior (n = '+m.n+'; events = '+m.events+'); core constructs and decision variables only.';
+  const indexOf=new Map(rows.map((r,i)=>[r.label,i]));
+  const ciData=rows.map((r,i)=>[i,i,r.low,r.high,r.p<.05?1:0]);
+  const sigData=rows.filter(r=>r.p<.05).map(r=>({value:[r.value,indexOf.get(r.label)],itemStyle:{color:'#12a594',borderColor:'#fff',borderWidth:1.8}}));
+  const nsData=rows.filter(r=>r.p>=.05).map(r=>({value:[r.value,indexOf.get(r.label)],itemStyle:{color:'#a8b4c1',borderColor:'#fff',borderWidth:1.8}}));
+  const xs=rows.flatMap(r=>[r.low,r.high,0]);
+  const xMin=Math.floor((Math.min(...xs)-2)/5)*5, xMax=Math.ceil((Math.max(...xs)+2)/5)*5;const ameLabelData=rows.map((r,i)=>({value:[Math.min(xMax-.35,r.high+.55),i]}));
+  const ameOption=motionDefaults({
+    tooltip:{trigger:'item',formatter:p=>{if(p.seriesType!=='scatter')return '';const r=rows[p.value[1]];return r.label+'<br/>AME = '+(r.value>=0?'+':'')+r.value.toFixed(1)+' percentage points<br/>95% CI: '+r.low.toFixed(1)+' to '+r.high.toFixed(1)+'<br/>P = '+r.p;}},
+    legend:{bottom:0,itemWidth:14,itemHeight:8,data:['95% CI excludes 0','95% CI includes 0']},
+    grid:{left:235,right:110,top:56,bottom:62,containLabel:true},
+    xAxis:{type:'value',min:xMin,max:xMax,name:'Change in screening probability (percentage points)',nameLocation:'middle',nameGap:35,axisLabel:{fontSize:12},splitLine:{lineStyle:{color:'#edf2f7'}}},
+    yAxis:{type:'category',inverse:true,data:rows.map(r=>r.label),axisTick:{show:false},axisLine:{show:false},axisLabel:{fontSize:12,lineHeight:16,width:205,overflow:'break',interval:0}},
+    series:[
+      {type:'custom',silent:true,renderItem:(params,api)=>{const y=api.value(1),low=api.value(2),high=api.value(3),sig=api.value(4);const a=api.coord([low,y]),c=api.coord([high,y]);const half=api.size([0,1])[1]*.20;const color=sig?'#12a594':'#a8b4c1';return {type:'group',children:[{type:'line',shape:{x1:a[0],y1:a[1],x2:c[0],y2:c[1]},style:{stroke:color,lineWidth:1.6}},{type:'line',shape:{x1:a[0],y1:a[1]-half,x2:a[0],y2:a[1]+half},style:{stroke:color,lineWidth:1.6}},{type:'line',shape:{x1:c[0],y1:c[1]-half,x2:c[0],y2:c[1]+half},style:{stroke:color,lineWidth:1.6}}]};},encode:{y:1,x:[2,3]},data:ciData,markLine:{silent:true,symbol:'none',lineStyle:{type:'dashed',color:'#4d6578',width:1.2},data:[{xAxis:0}]}},
+      {name:'95% CI excludes 0',type:'scatter',symbolSize:10,data:sigData,encode:{x:0,y:1},label:{show:false},animationDuration:1000},
+      {name:'95% CI includes 0',type:'scatter',symbolSize:10,data:nsData,encode:{x:0,y:1},label:{show:false},animationDuration:1000},
+      {name:'AME values',type:'scatter',silent:true,symbolSize:1,data:ameLabelData,encode:{x:0,y:1},itemStyle:{color:'transparent'},label:{show:true,position:'right',distance:5,align:'left',verticalAlign:'middle',fontSize:10.5,fontWeight:700,color:'#40566c',backgroundColor:'rgba(255,255,255,.94)',padding:[1,3],borderRadius:3,formatter:p=>{const r=rows[p.value[1]];return (r.value>=0?'+':'')+Number(r.value).toFixed(1);}},z:5}
+    ]
+  });
+  registerChart('ameChart',ameOption); chart('ameChart').setOption(ameOption);
+
+  document.getElementById('rows').innerHTML = m.features.slice(1).map((f,i)=>{
+    const p=m.p[i+1], unstable=m.unstable[i];
+    return '<tr><td><b>'+escapeHtml(f)+'</b></td>'+
+      '<td>'+m.coef[i+1]+'</td><td>'+m.se[i+1]+'</td><td>'+m.z[i+1]+'</td>'+
+      '<td>'+(p<0.05?'<span class="sig">'+p+'</span>':'<span class="ns">'+p+'</span>')+'</td>'+
+      '<td>'+m.ci_low[i+1]+' ~ '+m.ci_high[i+1]+'</td>'+
+      '<td><b>'+m.ame[i]+'</b></td><td>'+m.ame_ci_low[i]+' ~ '+m.ame_ci_high[i]+'</td>'+
+      '<td>'+(unstable?'<span class="tag tag-neg">Unstable estimate</span>':'')+'</td></tr>';
+  }).join('');
+})();
+</script>
+{% endblock %}

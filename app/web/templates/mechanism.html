@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block heading %}Decision Path Model{% endblock %}
+{% block content %}
+<h1>Standardized Path Model</h1>
+<div class="sub-title">How individual factors, cognitive biases, belief structure, and risk preference jointly shape screening intention and behavior</div>
+<div class="card figure-card reveal">
+  <div class="figure-head">
+    <div><h3 class="figure-title">Prospect Theory Screening Behavior Path Model</h3><p class="figure-caption">Numbers are standardized path coefficients (β); arrows indicate the hypothesized direction of influence.</p></div>
+    <span class="chart-badge"><i></i>Composite-score path model</span>
+  </div>
+  <div id="path" class="chart" style="height:720px" role="img" aria-label="Standardized path model of prospect theory screening behavior"></div>
+  <div id="fit" class="figure-note"></div>
+  <div class="figure-note"><b>Note:</b> Only major paths are labelled. Risk preference → intention is shown with a dotted line, and belief structure → screening behavior with a dashed line. This is a simplified composite-score path model, not a full latent-variable SEM with a measurement model.</div>
+</div>
+{% endblock %}
+{% block script %}<script>(async function(){
+  const d=await loadJSON('/api/mechanism'); const p=d.path;
+  const bc=p.belief_coef||{}, ic=p.intention_coef||{}, bh=p.behavior_coef||{};
+  const blue={color:{type:'linear',x:0,y:0,x2:1,y2:1,colorStops:[{offset:0,color:'#f3f8ff'},{offset:1,color:'#dbeafe'}]},borderColor:'#2563eb'};
+  const red={color:{type:'linear',x:0,y:0,x2:1,y2:1,colorStops:[{offset:0,color:'#fff6f8'},{offset:1,color:'#ffe1e7'}]},borderColor:'#df6478'};
+  const teal={color:{type:'linear',x:0,y:0,x2:1,y2:1,colorStops:[{offset:0,color:'#effcf9'},{offset:1,color:'#d4f5ee'}]},borderColor:'#12a594'};
+  const gold={color:{type:'linear',x:0,y:0,x2:1,y2:1,colorStops:[{offset:0,color:'#fffaf0'},{offset:1,color:'#ffedc2'}]},borderColor:'#e8a33d'};
+  const orange={color:{type:'linear',x:0,y:0,x2:1,y2:1,colorStops:[{offset:0,color:'#fff8f2'},{offset:1,color:'#ffe4d1'}]},borderColor:'#ef8b42'};
+  const node=(name,x,y,size,style,cat)=>({name,x,y,symbol:'roundRect',symbolSize:size,itemStyle:{color:style.color,borderColor:style.borderColor,borderWidth:2,shadowBlur:10,shadowColor:'rgba(37,99,235,.09)'},category:cat});
+  const nodes=[
+    node('Health literacy',150,75,[190,50],blue,0),
+    node('Self-efficacy',150,175,[190,50],blue,0),
+    node('Representativeness heuristic bias',150,290,[230,50],red,1),
+    node('Availability heuristic bias',150,390,[230,50],red,1),
+    node('Decision reference point',150,520,[200,50],blue,0),
+    node('Service accessibility',150,620,[190,50],blue,0),
+    node('Belief structure',520,185,[190,58],teal,2),
+    node('Risk preference',520,520,[190,58],teal,2),
+    node('Screening intention',830,300,[190,58],gold,3),
+    node('Screening behavior',1110,360,[190,58],orange,4)
+  ];
+  const line=(source,target,value,type)=>({source,target,value,lineStyle:{color:value<0?'#df6478':'#2f9fda',width:2,opacity:.82,type:type||'solid',curveness:.06}});
+  const links=[
+    line('Health literacy','Belief structure',Number(bc.health_literacy)||0),
+    line('Self-efficacy','Belief structure',Number(bc.self_efficacy)||0),
+    line('Representativeness heuristic bias','Belief structure',Number(bc.representative_bias)||0),
+    line('Availability heuristic bias','Belief structure',Number(bc.availability_bias)||0),
+    line('Decision reference point','Screening intention',Number(ic.decision_reference)||0),
+    line('Belief structure','Screening intention',Number(ic.belief_structure)||0),
+    line('Risk preference','Screening intention',Number(ic.risk_preference)||0,'dotted'),
+    line('Screening intention','Screening behavior',Number(bh.screening_intention)||0),
+    line('Belief structure','Screening behavior',Number(bh.belief_structure)||0,'dashed'),
+    line('Risk preference','Screening behavior',Number(bh.risk_preference)||0,'dashed'),
+    line('Service accessibility','Screening behavior',Number(bh.service_accessibility)||0)
+  ];
+  const option=motionDefaults({
+    tooltip:{formatter:x=>x.dataType==='edge'?x.data.source+' → '+x.data.target+'<br/>β = '+Number(x.data.value).toFixed(3):x.name},
+    legend:{bottom:0,itemWidth:12,itemHeight:8,data:['Individual and external factors','Cognitive biases','Belief and risk preference','Screening intention','Screening behavior'],textStyle:{fontSize:11}},
+    series:[{type:'graph',layout:'none',roam:true,draggable:true,left:120,right:140,top:20,bottom:50,categories:[{name:'Individual and external factors',itemStyle:{color:'#2563eb'}},{name:'Cognitive biases',itemStyle:{color:'#df6478'}},{name:'Belief and risk preference',itemStyle:{color:'#12a594'}},{name:'Screening intention',itemStyle:{color:'#e8a33d'}},{name:'Screening behavior',itemStyle:{color:'#ef8b42'}}],data:nodes,links:links,symbol:'roundRect',label:{show:true,position:'inside',fontSize:11,fontWeight:600,color:'#263c51'},edgeSymbol:['none','arrow'],edgeSymbolSize:9,edgeLabel:{show:true,fontSize:11,color:'#40566c',backgroundColor:'rgba(255,255,255,.90)',padding:[2,4],borderRadius:3,formatter:p=>Number(p.data.value).toFixed(2)},lineStyle:{color:'#496f8b',width:1.7,curveness:.06},emphasis:{focus:'adjacency',lineStyle:{width:3}},blur:{itemStyle:{opacity:.35},lineStyle:{opacity:.22}},animationDuration:1300}]
+  });
+  registerChart('path',option); chart('path').setOption(option);
+  document.getElementById('fit').innerHTML='<b>Model fit:</b> n = '+p.n+'; belief structure R² = '+p.r2_belief+'; risk preference R² = '+p.r2_risk+'; screening intention R² = '+p.r2_intention+'; screening behavior R² = '+p.r2_behavior+'.';
+})();</script>{% endblock %}

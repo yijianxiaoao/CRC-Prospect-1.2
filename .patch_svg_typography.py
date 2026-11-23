@@ -1,0 +1,25 @@
+﻿from pathlib import Path
+base=Path('app/web/static/images')
+for p in base.glob('*.svg'):
+    s=p.read_text(encoding='utf-8')
+    s=s.replace('font:700 15px system-ui,-apple-system,"Segoe UI",sans-serif','font:700 17px system-ui,-apple-system,"Segoe UI",sans-serif')
+    s=s.replace('font:12px system-ui,-apple-system,"Segoe UI",sans-serif','font:600 13.5px system-ui,-apple-system,"Segoe UI",sans-serif')
+    s=s.replace('font:600 14px system-ui,-apple-system,"Segoe UI",sans-serif','font:700 16px system-ui,-apple-system,"Segoe UI",sans-serif')
+    s=s.replace('font:700 12px system-ui,-apple-system,"Segoe UI",sans-serif','font:700 14px system-ui,-apple-system,"Segoe UI",sans-serif')
+    s=s.replace('font:10px system-ui,-apple-system,"Segoe UI",sans-serif','font:600 11.5px system-ui,-apple-system,"Segoe UI",sans-serif')
+    s=s.replace('font-size="11" font-weight="700" letter-spacing="1.2"','font-size="13" font-weight="800" letter-spacing="1.2"')
+    s=s.replace('fill="#dce9f3" font-size="11"','fill="#dce9f3" font-size="12.5" font-weight="600"')
+    s=s.replace('font-size="15" font-weight="800"','font-size="17" font-weight="800"')
+    p.write_text(s,encoding='utf-8')
+# Slightly widen research-design cards for larger supporting English.
+p=base/'research-design.svg'; s=p.read_text(encoding='utf-8')
+s=s.replace('<rect width="172" height="78"','<rect width="190" height="78"')
+s=s.replace('<rect width="178" height="78"','<rect width="190" height="78"')
+s=s.replace('<rect width="184" height="78"','<rect width="198" height="78"')
+s=s.replace('<rect width="208" height="78"','<rect width="224" height="78"')
+p.write_text(s,encoding='utf-8')
+# Widen the live-signal chip so its enlarged caption remains inside the card.
+p=base/'decision-journey.svg'; s=p.read_text(encoding='utf-8')
+s=s.replace('<rect width="188" height="66" rx="16" fill="#14304d"','<rect width="248" height="66" rx="16" fill="#14304d"')
+p.write_text(s,encoding='utf-8')
+print('SVG English typography enlarged')

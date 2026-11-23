@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f4c85">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{% block title %}Research Platform for Behavioral Mechanisms of Colonoscopy Screening in High-Risk Colorectal Cancer Populations · Prospect Theory{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+  <script src="{{ url_for('static', filename='js/echarts.min.js') }}"></script>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span><b>High-Risk Colorectal Cancer Populations<br>Colonoscopy Screening Behavior Research</b><small>PROSPECT THEORY · CRC SCREENING</small></div>
+    <nav>
+      {% set p = request.path %}
+      <div class="group">Research Overview</div>
+      <a href="/" class="{{ 'active' if p=='/' }}">Dashboard</a>
+      <a href="/about" class="{{ 'active' if p=='/about' }}">Study Design</a>
+      <div class="group">Study Cohort</div>
+      <a href="/subjects" class="{{ 'active' if p=='/subjects' }}">Study Participants and Baseline</a>
+      <a href="/intention" class="{{ 'active' if p=='/intention' }}">Screening Willingness and Outcomes</a>
+      <div class="group">Prospect Theory Measurement</div>
+      <a href="/scenarios" class="{{ 'active' if p=='/scenarios' }}">Scenario-Based Decisions</a>
+      <a href="/biases" class="{{ 'active' if p=='/biases' }}">Systematic Biases</a>
+      <a href="/risk" class="{{ 'active' if p=='/risk' }}">Risk Preference</a>
+      <a href="/constructs" class="{{ 'active' if p=='/constructs' }}">Constructs and Correlation Matrix</a>
+      <div class="group">Mechanisms and Modeling</div>
+      <a href="/mechanism" class="{{ 'active' if p=='/mechanism' }}">Decision Path Model</a>
+      <a href="/sem" class="{{ 'active' if p=='/sem' }}">Structural Equation Model</a>
+      <a href="/probit" class="{{ 'active' if p=='/probit' }}">Probit Analysis</a>
+      <a href="/forest" class="{{ 'active' if p=='/forest' }}">Forest Plot</a>
+      <a href="/psychometrics" class="{{ 'active' if p=='/psychometrics' }}">Scale Reliability and Validity</a>
+      <div class="group">Quality Control and Outputs</div>
+      <a href="/qc" class="{{ 'active' if p=='/qc' }}">Data Review and Quality Control</a>
+      <a href="/import" class="{{ 'active' if p=='/import' }}">Questionnaire Data Import</a>
+      <a href="/datadict" class="{{ 'active' if p=='/datadict' }}">Data Dictionary</a>
+      <a href="/report" class="{{ 'active' if p=='/report' }}">Research Report</a>
+      {% if session.get('role') == 'admin' %}
+      <a href="/audit" class="{{ 'active' if p=='/audit' }}">Audit Log</a>
+      <div class="group">System Administration</div>
+      <a href="/users" class="{{ 'active' if p=='/users' }}">Accounts and Permissions</a>
+      {% endif %}
+    </nav>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <div class="title">{% block heading %}Research Platform for Behavioral Mechanisms of Colonoscopy Screening in High-Risk Colorectal Cancer Populations{% endblock %}</div>
+      <div class="tools">
+        <span class="live-indicator" title="Interactive visual analytics enabled"><i></i>Live analytics</span>
+        <span>{{ session.get('nickname') or 'Researcher' }}
+          <span class="tag tag-blue" style="font-size:11px;margin-left:4px">
+            {{ {'admin':'Administrator','researcher':'Researcher','viewer':'Viewer'}.get(session.get('role'), 'Researcher') }}
+          </span>
+        </span>
+        <a class="btn" href="/security" style="text-decoration:none">Account Security</a>
+        <button class="btn" onclick="showPwd()">Change Password</button>
+        <form method="post" action="/logout" style="display:inline;margin:0">
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+          <button class="btn" type="submit">Sign Out</button>
+        </form>
+      </div>
+    </div>
+    <div class="content">{% block content %}{% endblock %}</div>
+  </div>
+</div>
+<div class="modal-mask" id="pwdMask">
+  <div class="modal">
+    <h4 style="margin:0 0 6px">Change Password</h4>
+    <label>Current password</label><input type="password" id="oldPwd">
+    <label>New password (at least 8 characters)</label><input type="password" id="newPwd">
+    <label>Confirm new password</label><input type="password" id="newPwd2">
+    <div class="actions"><button class="btn" onclick="hidePwd()">Cancel</button><button class="btn btn-primary" onclick="submitPwd()">Save</button></div>
+  </div>
+</div>
+<script>
+const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').content;
+function csrfHeaders(extra){ return Object.assign({}, extra || {}, {'X-CSRF-Token':CSRF_TOKEN}); }
+function escapeHtml(value){ return String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch])); }
+const CHART_REGISTRY = {};
+function chart(id){ const dom=document.getElementById(id); if(!dom) return null; const c=echarts.init(dom); CHART_REGISTRY[id]=c; window.addEventListener('resize',()=>c.resize()); return c; }
+async function loadJSON(url){ const r=await fetch(url); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }
+function showPwd(){ document.getElementById('pwdMask').style.display='flex'; }
+function hidePwd(){ document.getElementById('pwdMask').style.display='none'; }
+async function submitPwd(){ const body=new URLSearchParams({old_password:document.getElementById('oldPwd').value,new_password:document.getElementById('newPwd').value,new_password2:document.getElementById('newPwd2').value}); const r=await fetch('/change_password',{method:'POST',body,headers:csrfHeaders({'Accept':'application/json'})}); const d=await r.json(); alert(d.msg); if(d.ok) hidePwd(); }
+</script>
+<script src="{{ url_for('static', filename='js/visuals.js') }}"></script>
+{% block script %}{% endblock %}
+</body>
+</html>

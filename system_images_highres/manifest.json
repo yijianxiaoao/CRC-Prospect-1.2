@@ -1,0 +1,350 @@
+{
+  "generated_at": "2026-11-12T13:19:37.808333+00:00",
+  "source_system": "CRC Prospect Theory Research Platform",
+  "base_url": "http://127.0.0.1:5033",
+  "chart_pixel_ratio": 4,
+  "chart_count": 26,
+  "illustration_count": 5,
+  "items": [
+    {
+      "file": "charts/01_dashboard_decision_pathway.png",
+      "title": "Animated Decision Pathway",
+      "page": "Dashboard",
+      "route": "/",
+      "element_id": "journey",
+      "width": 3212,
+      "height": 1560,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/02_dashboard_high_risk_source_composition.png",
+      "title": "High-Risk Source Composition",
+      "page": "Dashboard",
+      "route": "/",
+      "element_id": "source",
+      "width": 2096,
+      "height": 1560,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/03_dashboard_intention_and_outcomes.png",
+      "title": "Screening Intention and Behavioral Outcomes",
+      "page": "Dashboard",
+      "route": "/",
+      "element_id": "outcome",
+      "width": 2656,
+      "height": 1760,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/04_dashboard_screening_barriers.png",
+      "title": "Main Screening Barriers",
+      "page": "Dashboard",
+      "route": "/",
+      "element_id": "barrier",
+      "width": 2652,
+      "height": 1760,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/05_dashboard_core_constructs.png",
+      "title": "Core Construct Overview (Normalized)",
+      "page": "Dashboard",
+      "route": "/",
+      "element_id": "construct",
+      "width": 3212,
+      "height": 1760,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/06_subjects_age_distribution.png",
+      "title": "Age Distribution",
+      "page": "Study Participants and Baseline",
+      "route": "/subjects",
+      "element_id": "age",
+      "width": 1596,
+      "height": 1680,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/07_subjects_sex_distribution.png",
+      "title": "Sex Distribution",
+      "page": "Study Participants and Baseline",
+      "route": "/subjects",
+      "element_id": "gender",
+      "width": 1596,
+      "height": 1680,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/08_subjects_education_distribution.png",
+      "title": "Education Distribution",
+      "page": "Study Participants and Baseline",
+      "route": "/subjects",
+      "element_id": "edu",
+      "width": 2120,
+      "height": 1760,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/09_intention_willingness_gap.png",
+      "title": "Screening Intention and Completion Gap",
+      "page": "Screening Willingness and Outcomes",
+      "route": "/intention",
+      "element_id": "gapChart",
+      "width": 2928,
+      "height": 2080,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/10_intention_screening_barriers.png",
+      "title": "Main Screening Barriers",
+      "page": "Screening Willingness and Outcomes",
+      "route": "/intention",
+      "element_id": "barrierChart",
+      "width": 2496,
+      "height": 2080,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/11_scenarios_choice_distribution.png",
+      "title": "Distribution of Choices Across 22 Scenario Items",
+      "page": "Scenario-Based Decisions",
+      "route": "/scenarios",
+      "element_id": "items",
+      "width": 5452,
+      "height": 4320,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/12_biases_radar_chart.png",
+      "title": "Mean Scores for Prospect Theory Bias Dimensions",
+      "page": "Systematic Biases",
+      "route": "/biases",
+      "element_id": "biasRadar",
+      "width": 2928,
+      "height": 2240,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/13_biases_odds_ratio_forest.png",
+      "title": "Odds Ratios for Bias Dimensions",
+      "page": "Systematic Biases",
+      "route": "/biases",
+      "element_id": "or",
+      "width": 2496,
+      "height": 2240,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/14_risk_prospect_value_function.png",
+      "title": "Animated Prospect Theory Value Function",
+      "page": "Risk Preference",
+      "route": "/risk",
+      "element_id": "valueFunction",
+      "width": 3268,
+      "height": 1880,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/15_risk_preference_indicators.png",
+      "title": "Risk Preference Indicators",
+      "page": "Risk Preference",
+      "route": "/risk",
+      "element_id": "risk",
+      "width": 2656,
+      "height": 1760,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/16_constructs_correlation_matrix.png",
+      "title": "Construct Correlation Matrix",
+      "page": "Constructs and Correlation Matrix",
+      "route": "/constructs",
+      "element_id": "corr",
+      "width": 5500,
+      "height": 2720,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/17_constructs_correlation_network.png",
+      "title": "Dynamic Construct Correlation Network",
+      "page": "Constructs and Correlation Matrix",
+      "route": "/constructs",
+      "element_id": "network",
+      "width": 5500,
+      "height": 2240,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/18_mechanism_decision_path_model.png",
+      "title": "Standardized Decision Path Model",
+      "page": "Decision Path Model",
+      "route": "/mechanism",
+      "element_id": "path",
+      "width": 5512,
+      "height": 2880,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/19_sem_structural_equation_model.png",
+      "title": "Structural Equation Model Path Diagram",
+      "page": "Structural Equation Model",
+      "route": "/sem",
+      "element_id": "path",
+      "width": 5560,
+      "height": 2480,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/20_probit_link_function.png",
+      "title": "Probit Link Function",
+      "page": "Probit Analysis",
+      "route": "/probit",
+      "element_id": "probitCurve",
+      "width": 3212,
+      "height": 1560,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/21_probit_average_marginal_effects.png",
+      "title": "Average Marginal Effects",
+      "page": "Probit Analysis",
+      "route": "/probit",
+      "element_id": "ameChart",
+      "width": 5452,
+      "height": 2560,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/22_forest_main_effects.png",
+      "title": "Main-Effect Forest Plot",
+      "page": "Forest Plot",
+      "route": "/forest",
+      "element_id": "mainForest",
+      "width": 5500,
+      "height": 2480,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/23_forest_subgroup_effects.png",
+      "title": "Subgroup Forest Plot",
+      "page": "Forest Plot",
+      "route": "/forest",
+      "element_id": "subForest",
+      "width": 5500,
+      "height": 3040,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/24_psychometrics_health_literacy_reliability.png",
+      "title": "Health Literacy Reliability",
+      "page": "Scale Reliability and Validity",
+      "route": "/psychometrics",
+      "element_id": "hlGauge",
+      "width": 800,
+      "height": 840,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/25_psychometrics_self_efficacy_reliability.png",
+      "title": "General Self-Efficacy Reliability",
+      "page": "Scale Reliability and Validity",
+      "route": "/psychometrics",
+      "element_id": "seGauge",
+      "width": 800,
+      "height": 840,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "charts/26_audit_action_type_statistics.png",
+      "title": "Action Type Statistics",
+      "page": "Audit Log",
+      "route": "/audit",
+      "element_id": "summary",
+      "width": 2656,
+      "height": 1280,
+      "pixel_ratio": 4
+    },
+    {
+      "file": "illustrations/png/28_decision_journey.png",
+      "vector_source": "illustrations/svg/27_decision_journey.svg",
+      "title": "Decision Journey",
+      "page": "System illustration",
+      "route": "/static/images/decision-journey.svg",
+      "width": 3800,
+      "height": 1892,
+      "pixel_ratio": 4,
+      "view_box": {
+        "x": -14,
+        "y": -18,
+        "w": 949.88330078125,
+        "h": 473
+      }
+    },
+    {
+      "file": "illustrations/png/30_screening_network.png",
+      "vector_source": "illustrations/svg/29_screening_network.svg",
+      "title": "Screening Decision Network",
+      "page": "System illustration",
+      "route": "/static/images/screening-network.svg",
+      "width": 2580,
+      "height": 2180,
+      "pixel_ratio": 4,
+      "view_box": {
+        "x": -15,
+        "y": -15,
+        "w": 645,
+        "h": 545
+      }
+    },
+    {
+      "file": "illustrations/png/32_research_design.png",
+      "vector_source": "illustrations/svg/31_research_design.svg",
+      "title": "Research Design Layers",
+      "page": "System illustration",
+      "route": "/static/images/research-design.svg",
+      "width": 2660,
+      "height": 1540,
+      "pixel_ratio": 4,
+      "view_box": {
+        "x": -15,
+        "y": -15,
+        "w": 665,
+        "h": 385
+      }
+    },
+    {
+      "file": "illustrations/png/34_data_integrity.png",
+      "vector_source": "illustrations/svg/33_data_integrity.svg",
+      "title": "Data Integrity and Privacy Shield",
+      "page": "System illustration",
+      "route": "/static/images/data-integrity.svg",
+      "width": 2640,
+      "height": 1520,
+      "pixel_ratio": 4,
+      "view_box": {
+        "x": -10,
+        "y": -10,
+        "w": 660,
+        "h": 380
+      }
+    },
+    {
+      "file": "illustrations/png/36_report_export.png",
+      "vector_source": "illustrations/svg/35_report_export.svg",
+      "title": "Research Report and Export",
+      "page": "System illustration",
+      "route": "/static/images/report-export.svg",
+      "width": 2828,
+      "height": 1520,
+      "pixel_ratio": 4,
+      "view_box": {
+        "x": -10,
+        "y": -10,
+        "w": 706.77587890625,
+        "h": 380
+      }
+    }
+  ]
+}

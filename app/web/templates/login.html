@@ -1,0 +1,164 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign In · Research Platform for Behavioral Mechanisms of Colonoscopy Screening in High-Risk Colorectal Cancer Populations</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,sans-serif;
+         background:linear-gradient(140deg,#0f4c85,#14304d 60%,#0b2438);min-height:100vh;
+         display:flex;align-items:center;justify-content:center}
+    .wrap{display:flex;width:960px;max-width:94vw;min-height:540px;border-radius:16px;overflow:hidden;
+          box-shadow:0 30px 70px rgba(0,0,0,.45);background:#fff}
+    .left{flex:1.2;background:linear-gradient(150deg,#1668b3,#0f4c85);color:#fff;padding:42px 38px;position:relative}
+    .left:after{content:"";position:absolute;right:-70px;bottom:-90px;width:260px;height:260px;
+                border-radius:50%;background:rgba(18,165,148,.28);z-index:1;pointer-events:none}
+    .login-art{position:absolute;right:-22px;bottom:-4px;width:82%;height:76%;object-fit:contain;opacity:.38;z-index:1;pointer-events:none;animation:loginFloat 7s ease-in-out infinite}
+    .left h1,.left p,.left ul,.left .badge{position:relative;z-index:2}
+    @keyframes loginFloat{0%,100%{transform:translateY(0) scale(.98)}50%{transform:translateY(-8px) scale(1.02)}}
+    .left .badge{display:inline-block;border:1px solid #7fc4e8;color:#bfe6f7;font-size:11.5px;
+                 padding:3px 12px;border-radius:999px;letter-spacing:1px;margin-bottom:20px}
+    .left h1{font-size:22px;line-height:1.6;margin:0 0 10px}
+    .left p{color:#cfe6f7;font-size:13px;line-height:1.9;position:relative;z-index:2}
+    .left ul{margin:24px 0 0;padding:0;list-style:none;position:relative;z-index:2}
+    .left li{font-size:12.5px;color:#d8ecf9;padding:6px 0 6px 18px;position:relative}
+    .left li:before{content:"";position:absolute;left:0;top:13px;width:6px;height:6px;
+                    border-radius:50%;background:#12a594}
+    .right{flex:1;padding:46px 40px}
+    .tabs{display:flex;gap:26px;border-bottom:1px solid #e3eaf2;margin-bottom:26px}
+    .tabs div{padding:0 2px 12px;cursor:pointer;font-weight:700;color:#8792a2;font-size:15px;
+              border-bottom:2px solid transparent}
+    .tabs div.on{color:#14304d;border-bottom-color:#12a594}
+    .fld{margin-bottom:16px}
+    .fld label{display:block;font-size:12.5px;color:#7b8b9c;margin-bottom:6px}
+    .fld input{width:100%;padding:11px 12px;border:1px solid #e3eaf2;border-radius:9px;font-size:14px;outline:none}
+    .fld input:focus{border-color:#1668b3}
+    .btn{width:100%;padding:12px;border:none;border-radius:9px;background:#1668b3;color:#fff;
+         font-size:15px;font-weight:700;cursor:pointer;letter-spacing:2px}
+    .btn:hover{background:#0f4c85}
+    .btn:disabled{opacity:.7;cursor:not-allowed}
+    .msg{min-height:20px;font-size:13px;margin:10px 0 0;color:#d94a4a}
+    .msg.ok{color:#1f9d55}
+    .hint{margin-top:20px;font-size:12.5px;color:#98a4b2;line-height:1.9;
+          background:#f7f9fc;border:1px dashed #dde4ee;border-radius:10px;padding:12px 14px}
+    .hide{display:none}
+    @media(max-width:820px){.left{display:none}.wrap{width:400px}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="left">
+    <img class="login-art" src="{{ url_for('static', filename='images/screening-network.svg') }}" alt="">
+    <span class="badge">PROSPECT THEORY · CRC SCREENING</span>
+    <h1>Prospect Theory-Based<br>Colorectal Cancer Screening Decision Platform</h1>
+    <p>Designed for high-risk colorectal cancer populations, integrating prospect theory, cognitive biases, risk preference, and decision reference points to model colonoscopy screening behavior.</p>
+    <ul>
+      <li>Study participants and baseline characteristics · Regional distribution</li>
+      <li>Screening willingness · Actual behavior vs. timing decisions</li>
+      <li>Prospect theory biases · Risk preference and average marginal effects</li>
+      <li>Belief structure · Decision paths and structural equation models</li>
+    </ul>
+  </div>
+  <div class="right">
+    <div class="tabs">
+      <div id="tabLogin" class="on" onclick="switchTab('login')">Sign In</div>
+      {% if registration_enabled %}
+      <div id="tabReg" onclick="switchTab('reg')">Register</div>
+      {% endif %}
+    </div>
+
+    <form id="formLogin">
+      <div class="fld"><label>Username</label><input id="lu" name="username" placeholder="Enter your username" autocomplete="username"></div>
+      <div class="fld"><label>Password</label><input id="lp" name="password" type="password" placeholder="Enter your password" autocomplete="current-password"></div>
+      <button class="btn" id="btnLogin" type="submit">Sign In</button>
+      {% if sso_available %}
+      <button class="btn" type="button" style="margin-top:10px;background:#12a594"
+              onclick="location.href='/sso/login?next='+encodeURIComponent(NEXT_URL)">Sign in with {{ sso_provider_name }}</button>
+      {% endif %}
+      <div class="msg" id="loginMsg"></div>
+      <div class="hint">
+        Administrators should use the initial password configured on this machine at first login; a password change is mandatory.
+        {% if not registration_enabled %}<br>Self-registration is disabled. Please contact an administrator to activate your account.{% endif %}
+      </div>
+    </form>
+
+    {% if registration_enabled %}
+    <form id="formReg" class="hide">
+      <div class="fld"><label>Username</label><input id="ru" name="username" placeholder="At least 3 characters"></div>
+      <div class="fld"><label>Name / Nickname (optional)</label><input id="rn" name="nickname" placeholder="Leave blank to use your username"></div>
+      <div class="fld"><label>Password</label><input id="rp" name="password" type="password" placeholder="At least 8 characters; include at least two of letters, numbers, and symbols"></div>
+      <div class="fld"><label>Confirm Password</label><input id="rp2" name="password2" type="password" placeholder="Enter your password again"></div>
+      <button class="btn" id="btnReg" type="submit">Register</button>
+      <div class="msg" id="regMsg"></div>
+      <div class="hint">Self-registered accounts are pending administrator approval. The default role is Viewer and is available only after approval.</div>
+    </form>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+const NEXT_URL = {{ (request.args.get('next') or '/') | tojson }};
+const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').content;
+const SSO_ERROR = {{ sso_error | tojson }};
+function switchTab(which){
+  const isLogin = which === 'login';
+  document.getElementById('tabLogin').className = isLogin ? 'on' : '';
+  document.getElementById('formLogin').className = isLogin ? '' : 'hide';
+  const tabReg = document.getElementById('tabReg');
+  const formReg = document.getElementById('formReg');
+  if(tabReg) tabReg.className = isLogin ? '' : 'on';
+  if(formReg) formReg.className = isLogin ? 'hide' : '';
+}
+function setMsg(id, text, ok){
+  const el = document.getElementById(id);
+  el.textContent = text || '';
+  el.className = 'msg' + (ok ? ' ok' : '');
+}
+async function doLogin(){
+  const user = document.getElementById('lu').value.trim();
+  const pwd = document.getElementById('lp').value;
+  if(!user || !pwd){ setMsg('loginMsg', 'Please enter your username and password.'); return; }
+  const btn = document.getElementById('btnLogin');
+  btn.disabled = true; btn.textContent = 'Signing in...';
+  setMsg('loginMsg', '');
+  try{
+    const body = new URLSearchParams({ username: user, password: pwd });
+    const r = await fetch('/login?next=' + encodeURIComponent(NEXT_URL), {
+      method:'POST', body, headers:{'X-CSRF-Token':CSRF_TOKEN, 'Accept':'application/json'}});
+    const d = await r.json();
+    setMsg('loginMsg', d.msg, d.ok);
+    if(d.ok){ setTimeout(() => location.href = d.redirect || '/', 300); return; }
+  }catch(e){ setMsg('loginMsg', 'Sign-in request failed: ' + e.message); }
+  finally{ btn.disabled = false; btn.textContent = 'Sign In'; }
+}
+async function doRegister(){
+  const user = document.getElementById('ru').value.trim();
+  const nick = document.getElementById('rn').value.trim();
+  const pwd = document.getElementById('rp').value;
+  const pwd2 = document.getElementById('rp2').value;
+  const btn = document.getElementById('btnReg');
+  btn.disabled = true; btn.textContent = 'Submitting...';
+  setMsg('regMsg', '');
+  try{
+    const body = new URLSearchParams({ username:user, nickname:nick, password:pwd, password2:pwd2 });
+    const r = await fetch('/register', {
+      method:'POST', body, headers:{'X-CSRF-Token':CSRF_TOKEN, 'Accept':'application/json'}});
+    const d = await r.json();
+    setMsg('regMsg', d.msg, d.ok);
+    if(d.ok){
+      setTimeout(() => { switchTab('login'); document.getElementById('lu').value = user;
+                          document.getElementById('lp').focus();
+                          setMsg('loginMsg', 'Registration submitted. Administrator approval is required before signing in.', true); }, 600);
+    }
+  }catch(e){ setMsg('regMsg', 'Registration request failed: ' + e.message); }
+  finally{ btn.disabled = false; btn.textContent = 'Register'; }
+}
+document.getElementById('formLogin').addEventListener('submit', e => { e.preventDefault(); doLogin(); });
+const registrationForm = document.getElementById('formReg');
+if(registrationForm) registrationForm.addEventListener('submit', e => { e.preventDefault(); doRegister(); });
+if(SSO_ERROR) setMsg('loginMsg', SSO_ERROR, false);
+</script>
+</body>
+</html>

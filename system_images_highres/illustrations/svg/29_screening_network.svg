@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 520" role="img" aria-labelledby="title desc">
+  <title id="title">Animated screening decision network</title><desc id="desc">Connected prospect theory constructs pulse through a decision network.</desc>
+  <defs>
+    <radialGradient id="sn-glow"><stop stop-color="#12a594" stop-opacity=".35"/><stop offset="1" stop-color="#12a594" stop-opacity="0"/></radialGradient>
+    <style>.node{animation:nodePulse 2.8s ease-in-out infinite}.n2{animation-delay:.45s}.n3{animation-delay:.9s}.n4{animation-delay:1.35s}.n5{animation-delay:1.8s}.flow{stroke-dasharray:5 10;animation:dash 2s linear infinite}.t{font:700 14px system-ui,-apple-system,"Segoe UI",sans-serif;fill:#14304d}.s{font:600 11.5px system-ui,-apple-system,"Segoe UI",sans-serif;fill:#718399}.tc{fill:#fff}@keyframes nodePulse{0%,100%{opacity:.62}50%{opacity:1}}@keyframes dash{to{stroke-dashoffset:-30}}@media(prefers-reduced-motion:reduce){*{animation:none!important}}</style>
+  </defs>
+  <circle cx="310" cy="260" r="210" fill="url(#sn-glow)"/>
+  <g fill="none" stroke="#4f89ad" stroke-width="1.5" opacity=".55">
+    <path d="M105 150C212 94 350 102 492 168"/><path d="M92 323C194 408 379 405 520 307"/><path d="M143 102C134 212 146 337 182 437"/><path d="M489 104C468 218 474 333 436 442"/><path d="M104 151L310 260 492 168M92 323l218-63 210 47M143 102l167 158 179-156"/>
+  </g>
+  <g fill="none" stroke="#12a594" stroke-width="2" opacity=".7">
+    <path class="flow" d="M105 150C212 94 350 102 492 168"/><path class="flow" d="M92 323C194 408 379 405 520 307"/><path class="flow" d="M143 102C134 212 146 337 182 437"/>
+  </g>
+  <g class="node" transform="translate(105 150)"><circle r="24" fill="#1668b3"/><circle r="36" fill="none" stroke="#7fc4e8" opacity=".35"/><text x="-34" y="52" class="t">Context</text><text x="-39" y="67" class="s">Risk + access</text></g>
+  <g class="node n2" transform="translate(492 168)"><circle r="24" fill="#c8973f"/><circle r="36" fill="none" stroke="#f0cb82" opacity=".35"/><text x="-35" y="52" class="t">Framing</text><text x="-42" y="67" class="s">Gain + loss</text></g>
+  <g class="node n3" transform="translate(92 323)"><circle r="24" fill="#5f72c8"/><circle r="36" fill="none" stroke="#a9b4ee" opacity=".35"/><text x="-40" y="52" class="t">Reference</text><text x="-45" y="67" class="s">Decision point</text></g>
+  <g class="node n4" transform="translate(520 307)"><circle r="24" fill="#d66b6b"/><circle r="36" fill="none" stroke="#efaaaa" opacity=".35"/><text x="-36" y="52" class="t">Biases</text><text x="-38" y="67" class="s">Heuristics</text></g>
+  <g class="node n5" transform="translate(310 260)"><circle r="42" fill="#12a594"/><circle r="59" fill="none" stroke="#8ee2d8" opacity=".34"/><text x="-31" y="-3" class="t tc">Decision</text><text x="-33" y="14" class="t tc">core</text><text x="-46" y="84" class="s">Intention → screening</text></g>
+  <g class="node" transform="translate(182 437)"><circle r="18" fill="#7b8b9c"/><text x="-27" y="42" class="t">Outcome</text></g>
+  <g class="node n2" transform="translate(436 442)"><circle r="18" fill="#7b8b9c"/><text x="-31" y="42" class="t">Behaviour</text></g>
+  <circle r="5" fill="#fff"><animateMotion dur="5s" repeatCount="indefinite" path="M105 150C212 94 350 102 492 168"/></circle>
+  <circle r="5" fill="#8ee2d8"><animateMotion dur="5s" begin="1.6s" repeatCount="indefinite" path="M92 323C194 408 379 405 520 307"/></circle>
+  <circle r="5" fill="#f0cb82"><animateMotion dur="5s" begin="3.2s" repeatCount="indefinite" path="M143 102C134 212 146 337 182 437"/></circle>
+</svg>

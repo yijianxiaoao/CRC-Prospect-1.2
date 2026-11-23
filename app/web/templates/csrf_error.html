@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block heading %}Request Validation Failed{% endblock %}
+{% block content %}
+<h1>Request Validation Failed</h1>
+<div class="card" style="max-width:680px">
+  <div style="font-size:42px;font-weight:700;color:#d94a4a;line-height:1">400</div>
+  <p style="font-size:14px;line-height:2;color:#4a6075;margin-top:14px">{{ message }}</p>
+  <div style="margin-top:16px"><button class="btn btn-primary" onclick="location.reload()">Refresh Page</button></div>
+</div>
+{% endblock %}

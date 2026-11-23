@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block heading %}Research Overview{% endblock %}
+{% block content %}
+<h1>Prospect Theory-Based Screening Decision Overview</h1>
+<div class="sub-title">Colonoscopy willingness among high-risk colorectal cancer populations: scenario-based decisions and actual behavior</div>
+
+<section class="hero-panel reveal" aria-labelledby="overview-hero-title">
+  <div class="hero-copy">
+    <div class="eyebrow">Interactive research cockpit</div>
+    <h2 id="overview-hero-title">See how context, cognition, and reference points move toward screening action.</h2>
+    <p>The platform connects the questionnaire, prospect-theory constructs, regression models, and behavioural outcomes in one visual workflow. The animated journey highlights where information is edited, evaluated, and translated into intention.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="/mechanism">Explore decision paths</a>
+      <a class="btn" href="/scenarios">View scenario evidence</a>
+    </div>
+    <div class="hero-stat-row" aria-label="Live cohort summary">
+      <div class="hero-stat"><b id="hero-n">-</b><span>Simulated participants</span></div>
+      <div class="hero-stat"><b id="hero-intention">-</b><span>Screening willingness</span></div>
+      <div class="hero-stat"><b id="hero-screening">-</b><span>Actual screening</span></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <img src="{{ url_for('static', filename='images/decision-journey.svg') }}" alt="Animated pathway from risk profile and mental editing to screening intention and action">
+    <div class="floating-chip"><i></i>Live decision signal</div>
+  </div>
+</section>
+
+<div class="grid c4">
+ <div class="card kpi reveal"><h3>Study Participants</h3><div class="num" id="k1">-</div></div>
+ <div class="card kpi reveal"><h3>Screening Willingness in the Next Six Months</h3><div class="num" id="k2">-</div><div class="sub">Intends to undergo colonoscopy</div></div>
+ <div class="card kpi reveal"><h3>Actual Screening Behavior</h3><div class="num" id="k3">-</div><div class="sub">Completed colonoscopy</div></div>
+ <div class="card kpi reveal"><h3>Mean Bias Level</h3><div class="num" id="k4">-</div><div class="sub">0 low, 1 high</div></div>
+</div>
+
+<div class="grid c21" style="margin-top:14px">
+ <div class="card visual-card reveal">
+   <div class="chart-toolbar"><h3>Animated Decision Pathway</h3><div><span class="chart-badge"><i></i>Auto focus</span> <button class="btn" type="button" onclick="replayChart('journey')">Replay</button></div></div>
+   <div id="journey" class="chart" style="height:390px"></div>
+ </div>
+ <div class="card visual-card reveal"><h3>High-Risk Source Composition</h3><div id="source" class="chart" style="height:390px"></div></div>
+</div>
+
+<div class="grid c2" style="margin-top:14px">
+ <div class="card reveal"><h3>Screening Intention and Behavioral Outcomes</h3><div id="outcome" class="chart tall"></div></div>
+ <div class="card reveal"><h3>Main Screening Barriers</h3><div id="barrier" class="chart tall"></div></div>
+</div>
+
+<div class="grid c21" style="margin-top:14px">
+ <div class="card reveal"><h3>Core Construct Overview (Normalized)</h3><div id="construct" class="chart tall"></div></div>
+ <div class="card insight-panel reveal">
+   <span class="chart-badge"><i></i>Interpretation</span>
+   <h3 style="margin-top:12px;color:#14304d;font-size:17px">From intention to observed action</h3>
+   <p>The dashboard separates willingness from completed colonoscopy. Use the decision-path, scenario, and Probit modules to inspect how biases, framing, and reference points explain the gap.</p>
+   <div class="story-strip" style="grid-template-columns:1fr 1fr">
+     <div class="story-step"><b>Edit</b><span>Framing and heuristics shape the mental representation.</span></div>
+     <div class="story-step"><b>Evaluate</b><span>Gains, losses, and probability weights determine preference.</span></div>
+     <div class="story-step"><b>Intend</b><span>Beliefs and context form a six-month screening plan.</span></div>
+     <div class="story-step"><b>Act</b><span>Access, policy, and reference points enable completion.</span></div>
+   </div>
+ </div>
+</div>
+{% endblock %}
+{% block script %}<script>
+(async function(){
+  const d=await loadJSON('/api/overview');
+  const k=d.kpis;
+  animateNumber('hero-n',k.n,'',0,1000); animateNumber('hero-intention',k.intention_rate,'%',1,1000); animateNumber('hero-screening',k.screening_rate,'%',1,1000);
+  animateNumber('k1',k.n,'',0,900); animateNumber('k2',k.intention_rate,'%',1,900); animateNumber('k3',k.screening_rate,'%',1,900); animateNumber('k4',k.mean_bias,'',3,900);
+
+  const journeyNodes=[
+    {name:'Context',x:75,y:190,symbolSize:66,itemStyle:{color:'#1668b3'},description:'Age, risk, access, policy'},
+    {name:'Editing',x:245,y:75,symbolSize:66,itemStyle:{color:'#12a594'},description:'Framing and heuristics'},
+    {name:'Reference',x:425,y:190,symbolSize:70,itemStyle:{color:'#c8973f'},description:'Gain-loss comparison point'},
+    {name:'Intention',x:615,y:75,symbolSize:66,itemStyle:{color:'#5f72c8'},description:'Six-month screening plan'},
+    {name:'Action',x:790,y:190,symbolSize:72,itemStyle:{color:'#08796d'},description:'Colonoscopy participation'}
+  ];
+  const journeyLinks=[
+    {source:'Context',target:'Editing',value:1},{source:'Editing',target:'Reference',value:2},
+    {source:'Reference',target:'Intention',value:3},{source:'Intention',target:'Action',value:4}
+  ];
+  const journeyOption=motionDefaults({
+    tooltip:{formatter:p=>p.dataType==='edge'?p.data.source+' <span style="color:#12a594">→</span> '+p.data.target:(p.data.description||p.name)},
+    series:[{type:'graph',layout:'none',roam:true,draggable:true,data:journeyNodes,links:journeyLinks,
+      symbol:'circle',label:{show:true,position:'bottom',distance:12,fontSize:11,fontWeight:700,color:'#24445f'},
+      edgeSymbol:['none','arrow'],edgeSymbolSize:8,lineStyle:{color:'#b8cfdf',width:2.2,curveness:.08},
+      emphasis:{focus:'adjacency',scale:1.18,label:{fontSize:12},lineStyle:{width:4,color:'#12a594'}},
+      blur:{itemStyle:{opacity:.28},lineStyle:{opacity:.18}},animationDuration:1500,animationEasing:'elasticOut'}]
+  });
+  registerChart('journey',journeyOption); chart('journey').setOption(journeyOption); startFocusLoop('journey',0,journeyNodes.length,1750);
+
+  const sourceOption=motionDefaults({tooltip:{trigger:'item',formatter:'{b}<br/>{c} participants ({d}%)'},legend:{bottom:0,type:'scroll'},
+    color:CRC_PALETTE,
+    series:[{type:'pie',radius:['43%','69%'],center:['50%','45%'],roseType:'radius',padAngle:2,itemStyle:{borderRadius:7,borderColor:'#fff',borderWidth:2},label:{show:false},labelLine:{show:false},data:d.risk_sources,animationType:'scale',animationDelay:i=>i*90}]});
+  registerChart('source',sourceOption); chart('source').setOption(sourceOption);
+
+  const outcomeOption=motionDefaults({tooltip:{trigger:'axis'},legend:{bottom:0},grid:{left:70,right:20,top:20,bottom:72},xAxis:{type:'category',data:d.outcomes.map(x=>x.name),axisLabel:{fontSize:10,interval:0,hideOverlap:false,rotate:0,lineHeight:17,formatter:value=>value==='Completed screening on time'?'Completed screening\non time':value}},yAxis:{type:'value',splitNumber:4,axisLabel:{hideOverlap:false}},series:[{type:'bar',data:d.outcomes.map(x=>x.value),barMaxWidth:52,itemStyle:{borderRadius:[7,7,0,0],color:{type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'#2c91d0'},{offset:1,color:'#1668b3'}]}},animationDelay:i=>i*110}]});
+  registerChart('outcome',outcomeOption); chart('outcome').setOption(outcomeOption);
+
+  const barrierRows=d.barriers.slice().reverse();
+  const barrierOption=motionDefaults({tooltip:{trigger:'axis'},grid:{left:145,right:22,top:10,bottom:30},xAxis:{type:'value'},yAxis:{type:'category',data:barrierRows.map(x=>x.name),axisLabel:{fontSize:10}},series:[{type:'bar',data:barrierRows.map(x=>x.value),barMaxWidth:22,itemStyle:{borderRadius:[0,6,6,0],color:{type:'linear',x:0,y:0,x2:1,y2:0,colorStops:[{offset:0,color:'#f3b24a'},{offset:.55,color:'#ef8b42'},{offset:1,color:'#df6478'}]}},animationDelay:i=>i*80}]});
+  registerChart('barrier',barrierOption); chart('barrier').setOption(barrierOption);
+
+  const radarValues=[Math.min(1,k.mean_health_literacy/5),Math.min(1,k.mean_self_efficacy/5),Math.max(0,1-k.mean_bias),k.intention_rate/100,k.screening_rate/100];
+  const constructOption=motionDefaults({tooltip:{trigger:'item'},radar:{center:['50%','50%'],radius:'66%',splitNumber:4,indicator:[{name:'Health literacy',max:1},{name:'Self-efficacy',max:1},{name:'Bias resistance',max:1},{name:'Screening intention',max:1},{name:'Screening action',max:1}],axisName:{color:'#51677c',fontSize:11},splitArea:{areaStyle:{color:['#fbfdff','#f5f9fc']}},splitLine:{lineStyle:{color:'#dfe9f2'}},axisLine:{lineStyle:{color:'#dfe9f2'}}},series:[{type:'radar',symbolSize:7,lineStyle:{width:2.5,color:'#12a594'},itemStyle:{color:'#1668b3'},areaStyle:{color:{type:'radial',x:.5,y:.5,r:.8,colorStops:[{offset:0,color:'rgba(18,165,148,.08)'},{offset:1,color:'rgba(18,165,148,.34)'}]}},data:[{value:radarValues,name:'Normalized cohort index'}],animationDuration:1400,animationEasing:'cubicOut'}]});
+  registerChart('construct',constructOption); chart('construct').setOption(constructOption);
+})();
+</script>{% endblock %}

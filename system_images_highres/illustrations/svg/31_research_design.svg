@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">Research design layers</title>
+  <desc id="desc">Four research layers connected from individual factors to screening behaviour.</desc>
+  <defs>
+    <linearGradient id="rd-bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f4f9ff"/><stop offset="1" stop-color="#edfaf7"/></linearGradient>
+    <linearGradient id="rd-line" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1668b3"/><stop offset="1" stop-color="#12a594"/></linearGradient>
+    <filter id="rd-shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="7" stdDeviation="8" flood-color="#14304d" flood-opacity=".12"/></filter>
+    <style>
+      .t{font:700 17px system-ui,-apple-system,"Segoe UI",sans-serif;fill:#14304d}.s{font:600 13.5px system-ui,-apple-system,"Segoe UI",sans-serif;fill:#718399}
+      .float{animation:floatGlow 4s ease-in-out infinite}.d2{animation-delay:.65s}.d3{animation-delay:1.3s}.d4{animation-delay:1.95s}
+      .dash{stroke-dasharray:7 8;animation:dash 2.4s linear infinite}@keyframes dash{to{stroke-dashoffset:-30}}@keyframes floatGlow{0%,100%{opacity:.88}50%{opacity:1}}
+      @media(prefers-reduced-motion:reduce){*{animation:none!important}}
+    </style>
+  </defs>
+  <rect width="640" height="360" rx="26" fill="url(#rd-bg)"/>
+  <path d="M78 76 C190 36 228 100 318 78 S454 32 560 72" fill="none" stroke="#c9dce9" stroke-width="2" opacity=".75"/>
+  <path d="M90 296 C190 330 236 264 326 292 S470 332 565 286" fill="none" stroke="#c9dce9" stroke-width="2" opacity=".75"/>
+  <g class="float" transform="translate(42 82)">
+    <rect width="190" height="78" rx="18" fill="#fff" filter="url(#rd-shadow)"/>
+    <circle cx="34" cy="34" r="18" fill="#e8f1fb"/><text x="28" y="40" fill="#1668b3" font-size="17" font-weight="800">01</text>
+    <text x="62" y="31" class="t">Context</text><text x="62" y="51" class="s">Individual + external</text>
+  </g>
+  <g class="float d2" transform="translate(236 54)">
+    <rect width="190" height="78" rx="18" fill="#fff" filter="url(#rd-shadow)"/>
+    <circle cx="34" cy="34" r="18" fill="#eef9f7"/><text x="28" y="40" fill="#12a594" font-size="17" font-weight="800">02</text>
+    <text x="62" y="31" class="t">Cognition</text><text x="62" y="51" class="s">Heuristics + framing</text>
+  </g>
+  <g class="float d3" transform="translate(146 154)">
+    <rect width="198" height="78" rx="18" fill="#fff" filter="url(#rd-shadow)"/>
+    <circle cx="34" cy="34" r="18" fill="#fff6e5"/><text x="28" y="40" fill="#c8973f" font-size="17" font-weight="800">03</text>
+    <text x="62" y="31" class="t">Evaluation</text><text x="62" y="51" class="s">Value + probability</text>
+  </g>
+  <g class="float d4" transform="translate(386 174)">
+    <rect width="224" height="78" rx="18" fill="#fff" filter="url(#rd-shadow)"/>
+    <circle cx="34" cy="34" r="18" fill="#eef2ff"/><text x="28" y="40" fill="#5f72c8" font-size="17" font-weight="800">04</text>
+    <text x="62" y="31" class="t">Screening outcome</text><text x="62" y="51" class="s">Intention → behaviour</text>
+  </g>
+  <path class="dash" d="M205 122 C234 151 235 161 245 178" fill="none" stroke="url(#rd-line)" stroke-width="3" stroke-linecap="round"/>
+  <path class="dash" d="M323 130 C307 154 297 160 290 174" fill="none" stroke="url(#rd-line)" stroke-width="3" stroke-linecap="round"/>
+  <path class="dash" d="M320 196 C348 201 364 202 395 205" fill="none" stroke="url(#rd-line)" stroke-width="3" stroke-linecap="round"/>
+  <circle r="5" fill="#1668b3"><animateMotion dur="3.2s" repeatCount="indefinite" path="M205 122 C234 151 235 161 245 178"/></circle>
+  <circle r="5" fill="#12a594"><animateMotion dur="3.2s" begin="1.05s" repeatCount="indefinite" path="M323 130 C307 154 297 160 290 174"/></circle>
+  <circle r="5" fill="#c8973f"><animateMotion dur="3.2s" begin="2.1s" repeatCount="indefinite" path="M320 196 C348 201 364 202 395 205"/></circle>
+  <g transform="translate(392 62)"><circle cx="54" cy="42" r="33" fill="#14304d"/><path d="M35 42h38M44 31l-10 11 10 11" fill="none" stroke="#8ee2d8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><text x="17" y="94" class="t">Path to screening</text></g>
+</svg>

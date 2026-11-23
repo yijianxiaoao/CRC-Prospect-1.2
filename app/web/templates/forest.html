@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% block heading %}Mechanism Research Forest Plot{% endblock %}
+{% block content %}
+<h1>Mechanism Research Forest Plot</h1>
+<div class="sub-title">Crude and adjusted odds ratios for each independent influencing factor and subgroup effects for perceived barriers</div>
+
+<div class="grid c4">
+  <div class="card kpi"><h3>Crude/Adjusted Effect Variables</h3><div class="num" id="k1">-</div></div>
+  <div class="card kpi"><h3>Significant After Adjustment</h3><div class="num" id="k2">-</div></div>
+  <div class="card kpi"><h3>Number of Subgroups</h3><div class="num" id="k3">-</div></div>
+  <div class="card kpi"><h3>Significant Subgroups</h3><div class="num" id="k4">-</div></div>
+</div>
+
+<div class="card" style="margin-top:14px">
+  <h3>Crude and Adjusted OR Forest Plot</h3>
+  <div id="mainForest" class="chart" style="height:620px"></div>
+</div>
+
+<div class="card" style="margin-top:14px">
+  <h3>Perceived Barriers: Subgroup Forest Plot</h3>
+  <div class="sub-title" style="margin:0 0 10px">ORs are adjusted for age and sex within each subgroup. Red dots indicate P &lt; 0.05 within a subgroup.</div>
+  <div id="subForest" class="chart" style="height:760px"></div>
+</div>
+
+<div class="grid c2" style="margin-top:14px">
+  <div class="card">
+    <h3>Crude and Adjusted OR Details</h3>
+    <div class="scroll" style="max-height:520px">
+      <table><thead><tr><th>Variable</th><th>Crude OR</th><th>95% CI</th><th>Adjusted OR</th><th>95% CI</th><th>Adjusted P</th></tr></thead>
+        <tbody id="mainRows"></tbody></table>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Subgroup OR Details</h3>
+    <div class="scroll" style="max-height:520px">
+      <table><thead><tr><th>Subgroup</th><th>Level</th><th>n</th><th>OR</th><th>95% CI</th><th>P</th><th>Interaction P</th></tr></thead>
+        <tbody id="subRows"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<div class="note" style="margin-top:14px">
+  <b>Methods: </b>Crude ORs are from univariable logistic regression models. Adjusted ORs control for age, sex, region, medical history, smoking, exercise, medical insurance, and key HBM dimensions.
+  Subgroup analyses define perceived barriers above the median as the exposure and adjust for age and sex within each subgroup.
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+function drawForest(id, rows, options){
+  const o = options || {};
+  if(!rows.length){ return; }
+  const labels = rows.map(r => o.label(r)).reverse();
+  const pData = rows.map(r => o.p ? o.p(r) : null).reverse();
+  const spec = o.series(rows);
+  chart(id).setOption(motionDefaults({
+    tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:p=>{
+      const i=p[0].dataIndex; const r=rows[rows.length-1-i];
+      return o.tooltip(r);
+    }},
+    legend:spec.legend,
+    grid:{left:250,right:95,top:24,bottom:56,containLabel:true},
+    xAxis:{type:'log',name:o.xName || 'OR (log scale)',nameLocation:'middle',nameGap:34,min:o.min,max:o.max,axisLabel:{fontSize:12}},
+    yAxis:{type:'category',data:labels,axisLabel:{fontSize:12,width:220,overflow:'break',lineHeight:15,interval:0,hideOverlap:false}},
+    series:spec.data.map((s,idx)=>{
+      if(s.type !== 'custom') return s;
+      return Object.assign({},s,{renderItem:(params,api)=>{
+        const y=api.value(1), low=api.value(2), high=api.value(3);
+        const a=api.coord([low,y]), b=api.coord([high,y]);
+        const half=api.size([0,1])[1]*0.22;
+        const color=s.color || '#7b8b9c';
+        return {type:'group',children:[
+          {type:'line',shape:{x1:a[0],y1:a[1],x2:b[0],y2:b[1]},style:{stroke:color,lineWidth:1.6}},
+          {type:'line',shape:{x1:a[0],y1:a[1]-half,x2:a[0],y2:a[1]+half},style:{stroke:color}},
+          {type:'line',shape:{x1:b[0],y1:b[1]-half,x2:b[0],y2:b[1]+half},style:{stroke:color}}
+        ]};
+      }});
+    })
+  }));
+}
+
+(async function(){
+  const d = await loadJSON('/api/forest');
+  const main = d.main || [];
+  const sub = d.subgroup || [];
+  k1.textContent = main.length;
+  k2.textContent = main.filter(r => r.adj_p !== null && r.adj_p < 0.05).length;
+  k3.textContent = sub.length;
+  k4.textContent = sub.filter(r => r.p !== null && r.p < 0.05).length;
+
+  const values = [];
+  main.forEach(r=>values.push(r.crude_low,r.adj_low,r.crude_high,r.adj_high));
+  const minMain = Math.max(0.05, Math.min.apply(null, values.filter(v=>v>0))*0.8);
+  const maxMain = Math.min(20, Math.max.apply(null, values)*1.2);
+  drawForest('mainForest', main, {
+    min:minMain,max:maxMain,
+    label:r=>r.name,
+    tooltip:r=>r.name+'<br/>Crude OR = '+r.crude_or+' ('+r.crude_low+'~'+r.crude_high+')'+
+      '<br/>Adjusted OR = '+r.adj_or+' ('+r.adj_low+'~'+r.adj_high+')<br/>Adjusted P = '+r.adj_p,
+    series:rows=>({legend:{data:['Crude OR','Adjusted OR'],bottom:0},data:[
+      {type:'custom',color:'#e8a33d',encode:{y:1,x:[2,3,1]},data:rows.map((r,i)=>[i,i,r.crude_low,r.crude_high]).reverse()},
+      {type:'custom',color:'#7c6ee6',encode:{y:1,x:[2,3,1]},data:rows.map((r,i)=>[i,i,r.adj_low,r.adj_high]).reverse()},
+      {name:'Crude OR',type:'scatter',symbolSize:11,itemStyle:{color:'#e8a33d',borderColor:'#fff',borderWidth:1.5},data:rows.map(r=>r.crude_or).reverse()},
+      {name:'Adjusted OR',type:'scatter',symbolSize:13,itemStyle:{color:'#2563eb',borderColor:'#fff',borderWidth:1.5},data:rows.map(r=>r.adj_or).reverse(),
+       markLine:{silent:true,symbol:'none',lineStyle:{type:'dashed',color:'#c8973f'},data:[{xAxis:1}]}}
+    ]})
+  });
+
+  const subValues = [];
+  sub.forEach(r=>subValues.push(r.ci_low,r.ci_high));
+  const minSub = Math.max(0.05, Math.min.apply(null, subValues.filter(v=>v>0))*0.8);
+  const maxSub = Math.min(20, Math.max.apply(null, subValues)*1.2);
+  drawForest('subForest', sub, {
+    min:minSub,max:maxSub,
+    label:r=>r.group+' · '+r.level,
+    tooltip:r=>r.group+' · '+r.level+'<br/>n = '+r.n+'<br/>OR = '+r.or+' ('+r.ci_low+'~'+r.ci_high+')<br/>P = '+r.p+'<br/>Interaction P = '+(r.p_interaction===null?'-':r.p_interaction),
+    series:rows=>({data:[
+      {type:'custom',color:'#2f9fda',encode:{y:1,x:[2,3,1]},data:rows.map((r,i)=>[i,i,r.ci_low,r.ci_high]).reverse()},
+      {type:'scatter',symbolSize:11,itemStyle:{color:p=>sub[sub.length-1-p.dataIndex].p<0.05?'#df6478':'#2563eb',borderColor:'#fff',borderWidth:1.5},
+       data:rows.map(r=>r.or).reverse(),markLine:{silent:true,symbol:'none',lineStyle:{type:'dashed',color:'#c8973f'},data:[{xAxis:1}]}}
+    ]})
+  });
+
+  document.getElementById('mainRows').innerHTML = main.map(r=>
+    '<tr><td>'+escapeHtml(r.name)+'</td><td>'+r.crude_or+'</td><td>'+r.crude_low+'~'+r.crude_high+'</td>'+
+    '<td><b>'+r.adj_or+'</b></td><td>'+r.adj_low+'~'+r.adj_high+'</td>'+
+    '<td>'+(r.adj_p<0.05?'<span class="sig">'+r.adj_p+'</span>':'<span class="ns">'+r.adj_p+'</span>')+'</td></tr>').join('');
+  document.getElementById('subRows').innerHTML = sub.map(r=>
+    '<tr><td>'+escapeHtml(r.group)+'</td><td>'+escapeHtml(r.level)+'</td><td>'+r.n+'</td>'+
+    '<td><b>'+r.or+'</b></td><td>'+r.ci_low+'~'+r.ci_high+'</td>'+
+    '<td>'+(r.p<0.05?'<span class="sig">'+r.p+'</span>':'<span class="ns">'+r.p+'</span>')+'</td>'+
+    '<td style="color:#8792a2">'+(r.p_interaction===null?'-':r.p_interaction)+'</td></tr>').join('');
+})();
+</script>
+{% endblock %}

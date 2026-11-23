@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block heading %}Risk preference{% endblock %}
+{% block content %}
+<h1>Risk Preference and Prospect Value Choices</h1><div class="sub-title">Certainty, reflection, and isolation effects and risk aversion</div>
+
+<div class="card visual-card reveal" style="margin-bottom:14px">
+  <div class="chart-toolbar">
+    <div><h3 style="margin:0 0 3px">Animated Prospect Theory Value Function</h3><span class="chart-badge"><i></i>Interactive model shape</span></div>
+    <div><button class="btn" type="button" onclick="setValueView('all')">Both domains</button><button class="btn" type="button" onclick="setValueView('gain')">Gain frame</button><button class="btn" type="button" onclick="setValueView('loss')">Loss frame</button><button class="btn" type="button" onclick="replayChart('valueFunction')">Replay</button></div>
+  </div>
+  <div class="grid c21">
+    <div id="valueFunction" class="chart" style="height:470px"></div>
+    <div class="insight-panel">
+      <h3 style="margin-top:0;color:#14304d;font-size:17px">Value is judged relative to a reference point</h3>
+      <p>The curve is concave for gains and steeper and convex for losses, illustrating diminishing sensitivity and loss aversion. The moving marker at the origin represents the reference point where neither a gain nor a loss has yet been coded.</p>
+      <div class="story-strip" style="grid-template-columns:1fr">
+        <div class="story-step"><b>Gain domain</b><span>People often become risk-averse as gains increase.</span></div>
+        <div class="story-step"><b>Loss domain</b><span>Losses loom larger and can encourage risk-seeking to avoid them.</span></div>
+        <div class="story-step"><b>Reference point</b><span>Policy, expectations, prior experience, and framing shift the origin.</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="grid c2"><div class="card visual-card reveal"><h3>Risk Preference Indicators</h3><div id="risk" class="chart tall"></div></div><div class="card reveal"><h3>Risk Construct Box Plot Statistics</h3><table><thead><tr><th>Indicator</th><th>Mean</th><th>Standard deviation</th><th>Q1</th><th>Q3</th></tr></thead><tbody id="rows"></tbody></table></div></div>
+<div class="note reveal" style="margin-top:14px"><b>Interpretation: </b>The certainty effect reflects a preference for definite outcomes. The reflection effect captures preference reversals between gain and loss frames. The isolation effect describes preference changes after common information is removed.</div>
+{% endblock %}
+{% block script %}<script>(async function(){
+const d=await loadJSON('/api/risk');const r=d.summary.rows;
+const gain=[],loss=[];for(let x=-8;x<=8.001;x+=.2){const v=Math.round(x*10)/10;if(v>0)gain.push([v,Math.pow(v,.88)]);else if(v<0)loss.push([v,-2.25*Math.pow(-v,.88)]);}
+const valueOption=motionDefaults({tooltip:{trigger:'axis',formatter:p=>{const x=Number(p[0].value[0]),y=Number(p[0].value[1]);return '<b>'+(x<0?'Loss domain':'Gain domain')+'</b><br/>x = '+x.toFixed(1)+'<br/>v(x) = '+y.toFixed(2)}},grid:{left:62,right:28,top:28,bottom:48},xAxis:{type:'value',min:-8,max:8,name:'Outcome relative to reference point',nameLocation:'middle',nameGap:31,axisLabel:{formatter:v=>v===0?'0':v},splitLine:{lineStyle:{color:'#edf2f7'}}},yAxis:{type:'value',min:-8,max:8,name:'Subjective value',axisLabel:{formatter:v=>v===0?'0':v},splitLine:{lineStyle:{color:'#edf2f7'}}},series:[
+ {name:'Gain value',type:'line',data:gain,showSymbol:false,smooth:true,lineStyle:{width:3.2,color:'#12a594'},areaStyle:{color:'rgba(18,165,148,.10)'},markArea:{silent:true,itemStyle:{color:'rgba(18,165,148,.035)'},data:[[{xAxis:0},{xAxis:8}]]}},
+ {name:'Loss value',type:'line',data:loss,showSymbol:false,smooth:true,lineStyle:{width:3.2,color:'#d94a4a'},areaStyle:{color:'rgba(217,74,74,.08)'},markArea:{silent:true,itemStyle:{color:'rgba(217,74,74,.035)'},data:[[{xAxis:-8},{xAxis:0}]]}},
+ {name:'Reference point',type:'effectScatter',data:[[0,0]],symbolSize:10,itemStyle:{color:'#c8973f'},rippleEffect:{scale:3.4,brushType:'stroke'},markLine:{silent:true,symbol:'none',lineStyle:{color:'#b8c5d2',type:'dashed'},data:[{xAxis:0},{yAxis:0}]}}
+],animationDuration:1700,animationEasing:'cubicOut'});
+registerChart('valueFunction',valueOption);chart('valueFunction').setOption(valueOption);
+window.setValueView=function(mode){const c=CHART_REGISTRY['valueFunction'];if(!c)return;c.setOption({series:[{data:mode==='loss'?[]:gain},{data:mode==='gain'?[]:loss},{}]},false);};
+
+const riskOption=motionDefaults({tooltip:{trigger:'axis'},grid:{left:80,right:20,top:20,bottom:60},xAxis:{type:'category',data:r.map(x=>x.name),axisLabel:{rotate:24,fontSize:10,interval:0,hideOverlap:false}},yAxis:{type:'value',splitNumber:4,axisLabel:{hideOverlap:false}},series:[{type:'bar',data:r.map(x=>x.mean),barMaxWidth:46,itemStyle:{borderRadius:[7,7,0,0],color:p=>{const pairs=[['#2563eb','#6ea6ff'],['#12a594','#4bd1c5'],['#e8a33d','#f5ca73'],['#7c6ee6','#b6a8ff'],['#df6478','#f2a1ae']];const c=pairs[p.dataIndex%pairs.length];return {type:'linear',x:0,y:1,x2:0,y2:0,colorStops:[{offset:0,color:c[0]},{offset:1,color:c[1]}]};}},animationDelay:i=>i*95}]});
+registerChart('risk',riskOption);chart('risk').setOption(riskOption);startFocusLoop('risk',0,r.length,1800);
+document.getElementById('rows').innerHTML=r.map(x=>'<tr><td>'+escapeHtml(x.name)+'</td><td>'+x.mean+'</td><td>'+x.sd+'</td><td>'+x.low+'</td><td>'+x.high+'</td></tr>').join('');
+})();</script>{% endblock %}

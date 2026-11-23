@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">Animated data integrity and privacy shield</title><desc id="desc">Protected research records pass through an animated quality-control scan.</desc>
+  <defs>
+    <linearGradient id="di-bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f2f8ff"/><stop offset="1" stop-color="#eefaf7"/></linearGradient>
+    <linearGradient id="di-shield" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1668b3"/><stop offset="1" stop-color="#12a594"/></linearGradient>
+    <filter id="di-shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#14304d" flood-opacity=".16"/></filter>
+    <style>.t{font:700 17px system-ui,-apple-system,"Segoe UI",sans-serif;fill:#14304d}.s{font:600 13.5px system-ui,-apple-system,"Segoe UI",sans-serif;fill:#718399}.pulse{transform-origin:center;animation:pulse 2.6s ease-out infinite}.scan{animation:scan 3s ease-in-out infinite}.float{animation:floatGlow 4s ease-in-out infinite}@keyframes pulse{0%{r:68px;opacity:.38}100%{r:110px;opacity:0}}@keyframes scan{0%,100%{transform:translateY(-44px);opacity:.2}50%{transform:translateY(74px);opacity:.95}}@keyframes floatGlow{0%,100%{opacity:.88}50%{opacity:1}}@media(prefers-reduced-motion:reduce){*{animation:none!important}}</style>
+  </defs>
+  <rect width="640" height="360" rx="26" fill="url(#di-bg)"/>
+  <g opacity=".32" stroke="#bdd5e7" stroke-width="1"><path d="M0 72H640M0 144H640M0 216H640M0 288H640"/><path d="M80 0V360M160 0V360M240 0V360M320 0V360M400 0V360M480 0V360M560 0V360"/></g>
+  <g transform="translate(88 62)">
+    <rect width="220" height="236" rx="22" fill="#fff" filter="url(#di-shadow)"/>
+    <rect x="18" y="18" width="184" height="38" rx="12" fill="#eaf3fb"/><circle cx="39" cy="37" r="7" fill="#1668b3"/><rect x="54" y="32" width="102" height="9" rx="4.5" fill="#b8d2e7"/>
+    <g fill="#eef3f8"><rect x="18" y="72" width="184" height="20" rx="7"/><rect x="18" y="102" width="184" height="20" rx="7"/><rect x="18" y="132" width="184" height="20" rx="7"/><rect x="18" y="162" width="184" height="20" rx="7"/><rect x="18" y="192" width="184" height="20" rx="7"/></g>
+    <g fill="#b7c6d6"><rect x="31" y="79" width="42" height="6" rx="3"/><rect x="31" y="109" width="72" height="6" rx="3"/><rect x="31" y="139" width="57" height="6" rx="3"/><rect x="31" y="169" width="88" height="6" rx="3"/><rect x="31" y="199" width="66" height="6" rx="3"/></g>
+    <rect class="scan" x="12" y="106" width="196" height="3" rx="1.5" fill="#12a594"/>
+  </g>
+  <g class="float" transform="translate(356 78)">
+    <circle class="pulse" cx="106" cy="104" r="68" fill="none" stroke="#12a594" stroke-width="2"/>
+    <path d="M106 24l72 27v55c0 47-30 77-72 96-42-19-72-49-72-96V51z" fill="url(#di-shield)" filter="url(#di-shadow)"/>
+    <path d="M72 101l22 22 47-52" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="26" y="246" class="t">Privacy + integrity</text><text x="20" y="266" class="s">PII blocks · audit chain · QC scans</text>
+  </g>
+  <g transform="translate(519 54)"><circle cx="20" cy="20" r="10" fill="#c8973f"/><circle cx="20" cy="20" r="17" fill="none" stroke="#c8973f" opacity=".25"><animate attributeName="r" values="12;26;12" dur="2.8s" repeatCount="indefinite"/><animate attributeName="opacity" values=".5;0;.5" dur="2.8s" repeatCount="indefinite"/></circle></g>
+</svg>

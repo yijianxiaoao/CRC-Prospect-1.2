@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block heading %}Data Dictionary{% endblock %}
+{% block content %}
+<h1>Data Dictionary</h1><div class="sub-title">Variable definitions, field types, and prospect theory construct descriptions</div>
+<div class="card"><h3>Prospect Theory Constructs</h3><div id="constructs" class="grid c4"></div></div>
+<div id="tables" style="margin-top:14px"></div>
+{% endblock %}
+{% block script %}<script>(async function(){const d=await loadJSON('/api/datadict');document.getElementById('constructs').innerHTML=d.constructs.map(x=>'<div class="card"><b>'+escapeHtml(x.name)+'</b><div style="color:#8792a2;font-size:12px">'+escapeHtml(x.key)+'</div></div>').join('');document.getElementById('tables').innerHTML=d.tables.map(t=>'<div class="card" style="margin-bottom:14px"><h3>'+escapeHtml(t.table)+' — '+escapeHtml(t.label)+'</h3><div class="scroll" style="max-height:420px"><table><thead><tr><th>Field</th><th>Type</th><th>Nullable</th><th>Description</th></tr></thead><tbody>'+t.fields.map(f=>'<tr><td style="font-family:monospace;color:#1668b3">'+escapeHtml(f.name)+'</td><td>'+escapeHtml(f.type)+'</td><td>'+(f.nullable?'is':'no')+'</td><td>'+escapeHtml(f.note||'')+'</td></tr>').join('')+'</tbody></table></div></div>').join('');})();</script>{% endblock %}

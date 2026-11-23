@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-labelledby="title desc">
+  <title id="title">Animated research report and export illustration</title><desc id="desc">Research charts and findings move from documents into a downloadable report package.</desc>
+  <defs>
+    <linearGradient id="re-bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f4f9ff"/><stop offset="1" stop-color="#fff8ea"/></linearGradient>
+    <linearGradient id="re-bar" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#1668b3"/><stop offset="1" stop-color="#12a594"/></linearGradient>
+    <filter id="re-shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#14304d" flood-opacity=".14"/></filter>
+    <style>.t{font:700 17px system-ui,-apple-system,"Segoe UI",sans-serif;fill:#14304d}.s{font:600 13.5px system-ui,-apple-system,"Segoe UI",sans-serif;fill:#718399}.grow{transform-box:fill-box;transform-origin:bottom;animation:grow 2.2s ease-in-out infinite alternate}.g2{animation-delay:.35s}.g3{animation-delay:.7s}.g4{animation-delay:1.05s}.float{animation:floatGlow 4.5s ease-in-out infinite}.arrow{stroke-dasharray:5 8;animation:dash 1.8s linear infinite}@keyframes grow{from{transform:scaleY(.46)}to{transform:scaleY(1)}}@keyframes floatGlow{0%,100%{opacity:.88}50%{opacity:1}}@keyframes dash{to{stroke-dashoffset:-39}}@media(prefers-reduced-motion:reduce){*{animation:none!important}}</style>
+  </defs>
+  <rect width="640" height="360" rx="26" fill="url(#re-bg)"/>
+  <g class="float" transform="translate(54 48) rotate(-3)">
+    <rect width="250" height="270" rx="22" fill="#fff" filter="url(#re-shadow)"/>
+    <rect x="24" y="26" width="82" height="10" rx="5" fill="#c7d8e7"/><rect x="24" y="47" width="145" height="7" rx="3.5" fill="#e4edf5"/>
+    <g transform="translate(24 82)"><rect width="202" height="104" rx="14" fill="#f6f9fc"/><path d="M16 80L48 48l32 15 36-36 54 34" fill="none" stroke="#12a594" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="48" cy="48" r="4" fill="#1668b3"/><circle cx="116" cy="27" r="4" fill="#c8973f"/></g>
+    <g transform="translate(28 213)" fill="url(#re-bar)"><rect width="22" height="31" rx="5" class="grow"/><rect x="34" width="22" height="44" rx="5" class="grow g2"/><rect x="68" width="22" height="56" rx="5" class="grow g3"/><rect x="102" width="22" height="38" rx="5" class="grow g4"/></g>
+  </g>
+  <path class="arrow" d="M316 180h88" fill="none" stroke="#1668b3" stroke-width="4" stroke-linecap="round"/><path d="M392 164l18 16-18 16" fill="none" stroke="#1668b3" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <g class="float" transform="translate(418 74) rotate(4)">
+    <rect width="172" height="212" rx="20" fill="#14304d" filter="url(#re-shadow)"/>
+    <rect x="22" y="22" width="78" height="9" rx="4.5" fill="#7fc4e8"/><rect x="22" y="42" width="124" height="6" rx="3" fill="#52718d"/>
+    <g transform="translate(22 72)"><rect width="128" height="42" rx="10" fill="#1e4565"/><rect x="12" y="14" width="74" height="7" rx="3.5" fill="#8ee2d8"/><rect x="12" y="27" width="46" height="5" rx="2.5" fill="#52718d"/></g>
+    <g transform="translate(22 126)"><rect width="128" height="42" rx="10" fill="#1e4565"/><rect x="12" y="14" width="66" height="7" rx="3.5" fill="#e5b455"/><rect x="12" y="27" width="54" height="5" rx="2.5" fill="#52718d"/></g>
+  </g>
+  <text x="429" y="326" class="t">Report package ready</text><text x="429" y="344" class="s">HTML · Excel · reproducible summary</text>
+</svg>

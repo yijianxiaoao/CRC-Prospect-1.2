@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block heading %}Account Security{% endblock %}
+{% block content %}
+<h1>Account Security</h1>
+<div class="sub-title">Manage authenticators, one-time recovery codes, and sign-in sources</div>
+
+<div class="card">
+  <h3>Multi-factor authentication (MFA)</h3>
+  {% if not mfa_available %}
+  <p>MFA has been disabled platform-wide by an administrator.</p>
+  {% elif mfa_enabled %}
+  <p><span class="tag tag-pos">Enabled</span> TOTP-based authenticator codes are enabled for this account.</p>
+  <p>Remaining recovery codes: <b>{{ recovery_count }}</b>. Only irreversible hashes are stored, so the original codes cannot be viewed again.</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+    <button class="btn" onclick="regenerateCodes()">Regenerate Recovery Codes</button>
+    {% if not mfa_required %}
+    <button class="btn" style="background:#b33a3a" onclick="disableMfa()">Disable MFA</button>
+    {% endif %}
+  </div>
+  {% if mfa_required %}<div class="note" style="margin-top:12px">MFA is required platform-wide and cannot be disabled by individual users.</div>{% endif %}
+  {% else %}
+  <p><span class="tag tag-neu">Not enabled</span> Add a second verification factor using an authenticator app.</p>
+  {% if mfa_required %}
+  <div class="note" style="margin-bottom:12px">MFA is required platform-wide. Complete setup before continuing.</div>
+  {% endif %}
+  <a class="btn btn-primary" href="/mfa/setup" style="display:inline-block;text-decoration:none">Enable MFA</a>
+  {% endif %}
+</div>
+
+<div class="card" style="margin-top:14px">
+  <h3>Sign-In and Identity Source</h3>
+  <table><tbody>
+    <tr><th style="width:160px">Authentication source</th><td>{{ 'Enterprise SSO' if auth_source == 'sso' else 'Local account' }}</td></tr>
+    <tr><th>SSO Linking</th><td>{{ 'Linked' if sso_linked else 'Not linked' }}</td></tr>
+    <tr><th>MFA Policy</th><td>{{ 'Global enforcement' if mfa_required else 'Optional' }}</td></tr>
+  </tbody></table>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+async function postSecurity(url, data){
+  const response=await fetch(url,{method:'POST',body:new URLSearchParams(data||{}),
+    headers:csrfHeaders({'Accept':'application/json'})});
+  return await response.json();
+}
+async function regenerateCodes(){
+  const code=prompt('Enter the current 6-digit authenticator code: ');
+  if(!code) return;
+  const data=await postSecurity('/account/mfa/recovery_codes',{code:code});
+  if(!data.ok){alert(data.msg);return;}
+  prompt('The new recovery codes will be shown only once. Save them offline: ',(data.recovery_codes||[]).join('\n'));
+  location.reload();
+}
+async function disableMfa(){
+  if(!confirm('Disable MFA? Afterward, only a password will be required to sign in.')) return;
+  const code=prompt('Enter an authenticator code or recovery code: ');
+  if(!code) return;
+  const data=await postSecurity('/account/mfa/disable',{code:code});
+  alert(data.msg);
+  if(data.ok) location.reload();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block heading %}Systematic bias{% endblock %}
+{% block content %}
+<h1>Prospect Theory Bias Profile and Screening Behavior</h1>
+<div class="sub-title">Mean scores for six bias dimensions (0–1) and their ORs with 95% CIs for screening behavior</div>
+<div class="card figure-card reveal">
+  <div class="figure-head">
+    <div><h3 class="figure-title">Prospect Theory Bias Profile and Screening Behavior</h3><p class="figure-caption">The radar chart shows the relative bias profile; the forest plot shows ORs and 95% CIs.</p></div>
+    <span class="chart-badge"><i></i>Dynamic figure</span>
+  </div>
+  <div class="figure-grid">
+    <div class="figure-panel">
+      <h3>Mean scores for six bias dimensions (0–1)</h3>
+      <div id="biasRadar" class="chart" style="height:560px" role="img" aria-label="Radar chart of mean scores for six prospect theory bias dimensions"></div>
+    </div>
+    <div class="figure-panel">
+      <h3>ORs between biases and screening behavior</h3>
+      <div id="or" class="chart" style="height:560px" role="img" aria-label="Forest plot of odds ratios for six bias dimensions"></div>
+    </div>
+  </div>
+  <div class="figure-note">OR greater than 1 indicates a positive association with screening behavior, while OR less than 1 indicates a negative association. The dashed line marks OR = 1.</div>
+</div>
+<div class="card reveal" style="margin-top:14px"><h3>Bias Effect Details</h3><table><thead><tr><th>Bias Dimension</th><th>Mean Score</th><th>OR</th><th>95% CI</th><th>P Value</th><th>Positive Cases</th></tr></thead><tbody id="rows"></tbody></table></div>
+{% endblock %}
+{% block script %}<script>(async function(){
+  const d=await loadJSON('/api/biases'); const b=d.biases||[];
+  const shortName=name=>name.replace('Representativeness heuristic bias','Representativeness').replace('Availability heuristic bias','Availability').replace('Anchoring and adjustment bias','Anchoring').replace('Certainty effect','Certainty').replace('Reflection effect','Reflection').replace('Isolation effect','Isolation');
+  const radarOption=motionDefaults({
+    tooltip:{trigger:'item'},
+    radar:{center:['50%','51%'],radius:'68%',splitNumber:5,indicator:b.map(x=>({name:shortName(x.name),max:1})),axisName:{color:'#263c51',fontSize:12},splitArea:{areaStyle:{color:['#fbfdff','#f4f9fc']}},splitLine:{lineStyle:{color:'#dce6ef'}},axisLine:{lineStyle:{color:'#cfdae5'}}},
+    series:[{type:'radar',symbolSize:7,lineStyle:{width:3,color:{type:'linear',x:0,y:0,x2:1,y2:1,colorStops:[{offset:0,color:'#2563eb'},{offset:.5,color:'#12a594'},{offset:1,color:'#7c6ee6'}]}},itemStyle:{color:'#2563eb'},areaStyle:{color:{type:'radial',x:.5,y:.5,r:.75,colorStops:[{offset:0,color:'rgba(37,99,235,.12)'},{offset:.55,color:'rgba(18,165,148,.20)'},{offset:1,color:'rgba(124,110,230,.32)'}]}},data:[{value:b.map(x=>x.score),name:'Mean bias score'}],animationDuration:1200,animationEasing:'cubicOut'}]
+  });
+  registerChart('biasRadar',radarOption); chart('biasRadar').setOption(radarOption);
+  const rows=b;
+  const ciData=rows.map((r,i)=>[i,i,r.ci_low,r.ci_high,r.p<0.05?1:0]);
+  const biasColors=['#2563eb','#12a594','#e8a33d','#7c6ee6','#df6478','#2f9fda'];const pointData=rows.map((r,i)=>({value:[r.or,i],itemStyle:{color:r.p<0.05?biasColors[i%biasColors.length]:'#a8b4c1',borderColor:'#fff',borderWidth:1.8}}));
+  const orOption=motionDefaults({
+    tooltip:{trigger:'item',formatter:p=>{if(p.seriesType!=='scatter')return '';const r=rows[p.value[1]];return r.name+'<br/>OR = '+r.or.toFixed(2)+' ('+r.ci_low.toFixed(2)+'–'+r.ci_high.toFixed(2)+')<br/>P = '+r.p;}},
+    grid:{left:180,right:90,top:25,bottom:48,containLabel:true},
+    xAxis:{type:'log',min:.2,max:2.2,name:'OR (95% CI, log scale)',nameLocation:'middle',nameGap:30,axisLabel:{fontSize:11},splitLine:{lineStyle:{color:'#edf2f7'}}},
+    yAxis:{type:'category',inverse:true,data:rows.map(x=>x.name),axisTick:{show:false},axisLine:{show:false},axisLabel:{fontSize:11,width:155,overflow:'break',lineHeight:15}},
+    series:[
+      {type:'custom',silent:true,renderItem:(params,api)=>{const y=api.value(1),low=api.value(2),high=api.value(3),sig=api.value(4);const a=api.coord([low,y]),c=api.coord([high,y]);const half=api.size([0,1])[1]*.20;const color=sig?biasColors[Math.round(api.value(1))%biasColors.length]:'#a8b4c1';return {type:'group',children:[{type:'line',shape:{x1:a[0],y1:a[1],x2:c[0],y2:c[1]},style:{stroke:color,lineWidth:1.6}},{type:'line',shape:{x1:a[0],y1:a[1]-half,x2:a[0],y2:a[1]+half},style:{stroke:color,lineWidth:1.6}},{type:'line',shape:{x1:c[0],y1:c[1]-half,x2:c[0],y2:c[1]+half},style:{stroke:color,lineWidth:1.6}}]};},encode:{y:1,x:[2,3]},data:ciData},
+      {type:'scatter',symbolSize:10,data:pointData,encode:{x:0,y:1},label:{show:true,position:'right',distance:7,fontSize:10.5,color:'#40566c',formatter:p=>Number(p.value[0]).toFixed(2)},markLine:{silent:true,symbol:'none',lineStyle:{type:'dashed',color:'#4d6578',width:1.2},data:[{xAxis:1}]},animationDuration:1000}
+    ]
+  });
+  registerChart('or',orOption); chart('or').setOption(orOption);
+  document.getElementById('rows').innerHTML=b.map(x=>'<tr><td><b>'+escapeHtml(x.name)+'</b></td><td>'+x.score+'</td><td>'+x.or+'</td><td>'+x.ci_low+'~'+x.ci_high+'</td><td>'+(x.p<0.05?'<span class="sig">'+x.p+'</span>':'<span class="ns">'+x.p+'</span>')+'</td><td>'+x.positives+' / '+x.n+'</td></tr>').join('');
+})();</script>{% endblock %}

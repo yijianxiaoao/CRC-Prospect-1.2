@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block heading %}Research Report{% endblock %}
+{% block content %}
+<h1>Research Reports and Data Export</h1><div class="sub-title">Automatically summarizes study participants, prospect theory constructs, bias effects, and path models</div>
+<div class="grid c21" style="margin-bottom:14px">
+  <div class="card visual-card reveal"><img class="illustration" src="{{ url_for('static', filename='images/report-export.svg') }}" alt="Animated research report and Excel export illustration"></div>
+  <div class="card insight-panel reveal"><span class="chart-badge"><i></i>Reproducible output</span><h3 style="margin-top:12px;color:#14304d;font-size:18px">Turn the live dashboard into a shareable research package</h3><p>The HTML report is ready for browser printing or PDF saving. The Excel package separates key indicators, construct summaries, and bias effects into analysis-ready worksheets.</p><div class="story-strip" style="grid-template-columns:1fr"><div class="story-step"><b>Indicators</b><span>Core cohort and screening metrics</span></div><div class="story-step"><b>Constructs</b><span>Descriptive summary by prospect-theory dimension</span></div><div class="story-step"><b>Effects</b><span>Bias estimates for rapid review</span></div></div></div>
+</div>
+<div class="grid c2"><div class="card reveal"><h3>Printable report</h3><p>The generated HTML report includes core indicators, construct statistics, and key models. It can be printed or saved as a PDF using the browser.</p><a class="btn btn-primary" target="_blank" href="/api/report/export?format=html">Generate a report</a></div><div class="card reveal"><h3>Excel Results Package</h3><p>Export worksheets for core indicators, construct summaries, and bias effects.</p><a class="btn btn-primary" href="/api/report/export?format=excel">Download Excel</a></div></div>
+<div class="note reveal" style="margin-top:14px">The current data are simulated. Report conclusions are not a substitute for findings from real data.</div>
+{% endblock %}

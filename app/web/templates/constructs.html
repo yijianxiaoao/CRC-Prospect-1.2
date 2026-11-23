@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block heading %}Constructs and Correlation Matrix{% endblock %}
+{% block content %}
+<h1>Core Prospect Theory Constructs</h1><div class="sub-title">Descriptive statistics and correlation matrix used for path models and structural equation models</div>
+<div class="card visual-card reveal"><div class="chart-toolbar"><h3>Construct correlation matrix</h3><div><span class="chart-badge"><i></i>Live heatmap</span> <button class="btn" type="button" onclick="replayChart('corr')">Replay</button></div></div><div id="corr" class="chart" style="height:680px"></div></div>
+<div class="card visual-card reveal" style="margin-top:14px"><div class="chart-toolbar"><h3>Dynamic Construct Correlation Network</h3><span class="chart-badge"><i></i>Force layout</span></div><div id="network" class="chart" style="height:560px"></div><div class="note" style="margin-top:8px">Edges retain absolute correlations of 0.18 or greater. Teal links are positive; red links are negative. Drag nodes to inspect local construct clusters.</div></div>
+<div class="card reveal" style="margin-top:14px"><h3>Construct Descriptive Statistics</h3><div class="scroll"><table><thead><tr><th>Construct</th><th>Mean</th><th>Standard deviation</th><th>Median</th><th>Minimum</th><th>Maximum</th></tr></thead><tbody id="rows"></tbody></table></div></div>
+{% endblock %}
+{% block script %}<script>(async function(){
+const d=await loadJSON('/api/constructs');const c=d.correlation;
+const corrOption=motionDefaults({tooltip:{position:'top',formatter:p=>c.labels[p.value[0]]+' × '+c.labels[p.value[1]]+'<br/>r = '+p.value[2]},grid:{left:230,right:32,top:22,bottom:132,containLabel:true},xAxis:{type:'category',data:c.labels,axisLabel:{rotate:52,fontSize:12,interval:0,margin:12}},yAxis:{type:'category',data:c.labels,axisLabel:{fontSize:12,width:210,overflow:'break',interval:0,lineHeight:15,hideOverlap:false}},visualMap:{min:-1,max:1,calculable:false,orient:'horizontal',left:'center',bottom:2,textStyle:{fontSize:11,fontWeight:700},inRange:{color:['#d35d5d','#f4b4be','#fff','#94b8ff','#2563eb']}},series:[{type:'heatmap',data:c.data,label:{show:true,fontSize:11,fontWeight:700},itemStyle:{borderColor:'#fff',borderWidth:2},emphasis:{itemStyle:{shadowBlur:12,shadowColor:'rgba(20,48,77,.25)'}}}]});
+registerChart('corr',corrOption);chart('corr').setOption(corrOption);
+const palette=CRC_PALETTE;
+const nodes=c.labels.map((name,i)=>({name:name,symbolSize:50+(i%3)*6,itemStyle:{color:palette[i%palette.length],borderColor:'#fff',borderWidth:2},emphasis:{scale:1.25}}));
+const links=[];c.data.forEach(v=>{const a=Number(v[0]),b=Number(v[1]),r=Number(v[2]);if(a<b&&Math.abs(r)>=.18){links.push({source:c.labels[a],target:c.labels[b],value:r,lineStyle:{width:1+Math.abs(r)*5,opacity:.18+Math.abs(r)*.58,color:r>=0?'#12a594':'#d94a4a',curveness:.05}});}});
+const networkOption=motionDefaults({tooltip:{formatter:p=>p.dataType==='edge'?(p.data.source+' ↔ '+p.data.target+'<br/>r = '+Number(p.data.value).toFixed(3)):(p.data.name+'<br/>Drag to explore connections')},series:[{type:'graph',layout:'force',left:70,right:92,top:38,bottom:62,roam:true,draggable:true,data:nodes,links:links,label:{show:true,fontSize:11,fontWeight:700,color:'#24445f',position:'bottom',distance:8,width:105,overflow:'break',lineHeight:14},labelLayout:{hideOverlap:true,moveOverlap:'shiftY'},force:{repulsion:320,edgeLength:[90,160],gravity:.065,friction:.70},emphasis:{focus:'adjacency',scale:1.18,label:{fontSize:12}},blur:{itemStyle:{opacity:.18},lineStyle:{opacity:.06}},animationDuration:1500,animationEasing:'cubicOut'}]});
+registerChart('network',networkOption);chart('network').setOption(networkOption);startFocusLoop('network',0,nodes.length,2000);
+document.getElementById('rows').innerHTML=d.rows.map(r=>'<tr><td><b>'+escapeHtml(r.name)+'</b></td><td>'+r.mean+'</td><td>'+r.sd+'</td><td>'+r.median+'</td><td>'+r.min+'</td><td>'+r.max+'</td></tr>').join('');
+})();</script>{% endblock %}

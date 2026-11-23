@@ -1,0 +1,77 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Two-Factor Verification · CRC Screening Research Platform</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+         font-family:system-ui,sans-serif;
+         background:linear-gradient(140deg,#0f4c85,#14304d 60%,#0b2438)}
+    .card{width:440px;max-width:92vw;background:#fff;border-radius:16px;padding:36px 38px;
+          box-shadow:0 30px 70px rgba(0,0,0,.4)}
+    .badge{display:inline-block;color:#0f6b60;background:#e7f7f4;border-radius:999px;
+           padding:4px 11px;font-size:12px;margin-bottom:14px}
+    h1{font-size:21px;margin:0 0 8px;color:#14304d}
+    p{font-size:13px;color:#7b8b9c;line-height:1.8}
+    label{display:block;font-size:12.5px;color:#7b8b9c;margin:20px 0 7px}
+    input[type=text]{width:100%;padding:13px;border:1px solid #dce5ef;border-radius:9px;
+                     font-size:20px;letter-spacing:5px;text-align:center;outline:none}
+    input[type=text]:focus{border-color:#1668b3}
+    .btn{width:100%;margin-top:18px;padding:12px;border:0;border-radius:9px;background:#1668b3;
+         color:#fff;font-size:15px;font-weight:700;cursor:pointer}
+    .btn:disabled{opacity:.65;cursor:not-allowed}
+    .msg{min-height:20px;margin-top:10px;font-size:13px;color:#d94a4a}
+    .msg.ok{color:#1f9d55}
+    .recovery{font-size:13px;color:#627387;margin-top:14px}
+    a{color:#1668b3;text-decoration:none}
+  </style>
+</head>
+<body>
+<div class="card">
+  <span class="badge">SECOND FACTOR</span>
+  <h1>Authenticator Verification</h1>
+  <p>Enter the current 6-digit code shown in your authenticator app. Codes normally refresh every 30 seconds.</p>
+  <form id="mfaForm">
+    <label>Authenticator or recovery code</label>
+    <input id="code" name="code" type="text" maxlength="14" autocomplete="one-time-code"
+           inputmode="numeric" placeholder="000000" autofocus>
+    <div class="recovery"><label style="margin:0"><input id="recovery" type="checkbox"> Use a one-time recovery code</label></div>
+    <button class="btn" id="submitBtn" type="submit">Verify</button>
+    <div class="msg" id="msg"></div>
+  </form>
+  <p style="margin-top:18px"><a href="/login">Return to Sign In</a></p>
+</div>
+<script>
+const TOKEN = document.querySelector('meta[name="csrf-token"]').content;
+const form = document.getElementById('mfaForm');
+const recovery = document.getElementById('recovery');
+const code = document.getElementById('code');
+function message(text, ok){
+  const el=document.getElementById('msg'); el.textContent=text||''; el.className='msg'+(ok?' ok':'');
+}
+recovery.addEventListener('change', () => {
+  code.inputMode = recovery.checked ? 'text' : 'numeric';
+  code.placeholder = recovery.checked ? 'XXXXX-XXXXX' : '000000';
+  code.value=''; code.focus();
+});
+form.addEventListener('submit', async event => {
+  event.preventDefault();
+  if(!code.value.trim()){ message('Please enter the authenticator code.'); return; }
+  const button=document.getElementById('submitBtn');
+  button.disabled=true; button.textContent='Verifying...'; message('');
+  try{
+    const body=new URLSearchParams({code:code.value.trim(), use_recovery:recovery.checked?'1':'0'});
+    const response=await fetch('/mfa',{method:'POST',body,
+      headers:{'X-CSRF-Token':TOKEN,'Accept':'application/json'}});
+    const data=await response.json();
+    message(data.msg,data.ok);
+    if(data.ok){ setTimeout(()=>location.href=data.redirect||'/',250); return; }
+  }catch(error){ message('Verification request failed: '+error.message); }
+  button.disabled=false; button.textContent='Verify'; code.select();
+});
+</script>
+</body>
+</html>
