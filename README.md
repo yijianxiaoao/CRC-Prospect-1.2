@@ -1,7 +1,5 @@
 ﻿# Behavioral Mechanisms of Colonoscopy Screening in High-Risk Colorectal Cancer Populations: Prospect Theory Edition
 
-This project is located at `D:\CRCProspectTheoryResearch-English`. It was redesigned based on the theoretical structure of the *Colorectal Cancer Screening Behavior Questionnaire for High-Risk Populations* and the doctoral dissertation *Research on Patient Healthcare-Seeking Decision-Making Based on Prospect Theory*.
-
 The platform maps the editing stage, evaluation stage, value function, weighting function, reference points, systematic biases, and risk preferences of prospect theory to willingness to undergo colonoscopy screening and actual screening behavior among high-risk colorectal cancer populations.
 
 ## 1. Theoretical Framework
