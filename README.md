@@ -6,35 +6,26 @@ The platform maps the editing stage, evaluation stage, value function, weighting
 ##1.Software Installation
 | Software | Requirement | Purpose | Official Download |
 |---|---|---|---|
-| **Python 3.12 (64-bit)** | Required | Runs the Flask application and installs Python dependencies | [Download Python](https://www.python.org/downloads/windows/) |
-| **MySQL Community Server 8.0/8.4 LTS** | Required | Stores research data and account information | [Download MySQL Installer](https://dev.mysql.com/downloads/installer/) · [Download MySQL Server](https://dev.mysql.com/downloads/mysql/) |
-| **Microsoft Edge or Google Chrome** | Required | Accesses the web application | [Download Google Chrome](https://www.google.com/chrome/) |
 | **PyCharm Community / PyCharm** | Optional, recommended | Edits code, configures the Python environment, and runs the project | [Download PyCharm](https://www.jetbrains.com/pycharm/download/) |
+| **MySQL Community Server 8.0/8.4 LTS** | Required | Stores research data and account information | [Download MySQL Installer](https://dev.mysql.com/downloads/installer/) · [Download MySQL Server](https://dev.mysql.com/downloads/mysql/) |
+| **Python 3.12 (64-bit)** | Required | Runs the Flask application and installs Python dependencies | [Download Python](https://www.python.org/downloads/windows/) |
+| **Microsoft Edge or Google Chrome** | Required | Accesses the web application | [Download Google Chrome](https://www.google.com/chrome/) |
 
+##2. Running the Platform
 
+Use a Python virtual environment and install the dependencies:
 
-
-
-## 1. Theoretical Framework
-
-The model has four layers:
-
-1. **Individual and external factors**: age, sex, education, marital status, medical insurance, income, family history, chronic disease, health literacy, self-efficacy, service accessibility, and policy support.
-2. **Information cognition and editing**: representativeness heuristic, availability heuristic, anchoring and adjustment, disease cognition, health value accounts, and cost/time/risk reference points.
-3. **Evaluation and preference**: certainty effect, reflection effect, isolation effect, and risk aversion.
-4. **Screening decision outcomes**: screening intention over the next six months, hospital level, screening method, timing decision, and actual colonoscopy participation.
-
-The theoretical pathway is:
-
-```text
-Individual and external factors + Systematic biases
-        ↓
-Belief structure + Risk preference → Decision reference point
-        ↓
-Screening intention → Actual screening behavior
+```bash
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe manage.py init
+.\.venv\Scripts\python.exe manage.py seed
+.\.venv\Scripts\python.exe manage.py status
+.\.venv\Scripts\python.exe run.py
 ```
+The default address is `http://127.0.0.1:5012`.
 
-## 2. Questionnaire-to-System Variable Mapping
+## 3. Questionnaire-to-System Variable Mapping
 
 | Questionnaire section | System variables | Research location |
 | --- | --- | --- |
@@ -50,7 +41,7 @@ Screening intention → Actual screening behavior
 
 Names, national ID numbers, contact information, signatures, and residential addresses are not written to the study database. The import process detects and rejects these fields.
 
-## 3. Main Functional Modules
+## 4. Main Functional Modules
 
 - **Dashboard**: study participants, screening willingness, actual screening, bias levels, and main barriers.
 - **Study Participants and Baseline**: demographics, region, medical insurance, income, family history, and health status.
@@ -67,7 +58,7 @@ Names, national ID numbers, contact information, signatures, and residential add
 - **Questionnaire Data Import and Quality Control**: CSV/XLSX import, template download, PII blocking, and row-level transactions.
 - **Audit and Account Management**: RBAC, MFA, SSO, account approval, and a tamper-evident audit chain.
 
-## 4. Data Tables
+## 5. Data Tables
 
 | Table | Purpose |
 | --- | --- |
@@ -82,7 +73,7 @@ Names, national ID numbers, contact information, signatures, and residential add
 | `t_data_lock` | Data lock records |
 | `t_user` | Platform accounts and authentication information |
 
-## 5. Simulated Data
+## 6. Simulated Data
 
 The project uses reproducible simulated data. The data-generating function is located at:
 
@@ -97,30 +88,3 @@ By default, it generates 1,600 simulated study participants. The random seed is 
 - Decision reference points and policy support promote conversion from intention to behavior.
 - Certainty and reflection effects alter risk choices and screening behavior.
 
-## 6. Running the Platform
-
-Use a Python virtual environment and install the dependencies:
-
-```bash
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe manage.py init
-.\.venv\Scripts\python.exe manage.py seed
-.\.venv\Scripts\python.exe manage.py status
-.\.venv\Scripts\python.exe run.py
-```
-
-The default address is `http://127.0.0.1:5012`.
-
-## 7. Database and Security
-
-- Default database: `crc_prospect_en`.
-- Application database account: `crc_app`.
-- Local credential files are stored in `app/data/` and must not be committed to version control.
-- The platform supports MFA, OIDC single sign-on, account approval, and configurable self-registration.
-- Account creation, import, review, export, and account-management actions are written to the audit log.
-- Data import and research-data writes are blocked while data are locked.
-
-## 8. Important Notice
-
-This project uses simulated data to demonstrate prospect-theory decision-making mechanisms and platform functions. It must not be used for clinical diagnosis or real-world policy inference. Formal applications require ethics-approved questionnaire data and compliance with data-minimization and local privacy regulations.
