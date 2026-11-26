@@ -2,6 +2,8 @@
 
 The platform maps the editing stage, evaluation stage, value function, weighting function, reference points, systematic biases, and risk preferences of prospect theory to willingness to undergo colonoscopy screening and actual screening behavior among high-risk colorectal cancer populations.
 
+
+##1.Software Installation
 | Software | Requirement | Purpose | Official Download |
 |---|---|---|---|
 | **Python 3.12 (64-bit)** | Required | Runs the Flask application and installs Python dependencies | [Download Python](https://www.python.org/downloads/windows/) |
